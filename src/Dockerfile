@@ -5,24 +5,34 @@ MAINTAINER joseph.copenhaver@gmail.com
 RUN echo 'First apt-get upgrade ran on `date +%s`=1547715141' \
  && export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get upgrade -y
 
-COPY ./provision/scripts/01_basic_linux_packages /tmp/01_basic_linux_packages
-RUN bash /tmp/01_basic_linux_packages \
- && rm /tmp/01_basic_linux_packages \
+COPY ./provisioners/scripts/01_basic_linux_packages.sh /tmp/01_basic_linux_packages.sh
+RUN bash /tmp/01_basic_linux_packages.sh \
+ && rm /tmp/01_basic_linux_packages.sh \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./provision/scripts/02_base_python_runtime /tmp/02_base_python_runtime
-RUN bash /tmp/02_base_python_runtime \
- && rm /tmp/02_base_python_runtime \
+COPY ./provisioners/scripts/02_install_provision_functions.sh /tmp/02_install_provision_functions.sh
+RUN bash /tmp/02_install_provision_functions.sh \
+ && rm /tmp/02_install_provision_functions.sh \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./provision/scripts/03_install_rcode_rmate /tmp/03_install_rcode_rmate
-RUN bash /tmp/03_install_rcode_rmate \
- && rm /tmp/03_install_rcode_rmate \
+COPY ./provisioners/scripts/03_base_python_runtime.sh /tmp/03_base_python_runtime.sh
+RUN bash /tmp/03_base_python_runtime.sh \
+ && rm /tmp/03_base_python_runtime.sh \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./provision/scripts/04_install_vagrant_support /tmp/04_install_vagrant_support
-RUN bash /tmp/04_install_vagrant_support \
- && rm /tmp/04_install_vagrant_support \
+COPY ./provisioners/scripts/04_install_rcode_rmate.sh /tmp/04_install_rcode_rmate.sh
+RUN bash /tmp/04_install_rcode_rmate.sh \
+ && rm /tmp/04_install_rcode_rmate.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/05_install_vagrant_support.sh /tmp/05_install_vagrant_support.sh
+RUN bash /tmp/05_install_vagrant_support.sh \
+ && rm /tmp/05_install_vagrant_support.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/06_configure_python_version_manager.sh /tmp/06_configure_python_version_manager.sh
+RUN bash /tmp/06_configure_python_version_manager.sh \
+ && rm /tmp/06_configure_python_version_manager.sh \
  && rm -rf /var/lib/apt/lists/*
 
 STOPSIGNAL SIGRTMIN+3

@@ -5,22 +5,26 @@
     use_remote_cache="$1"
     only_build_dockerfile="$2"
 
-    cp Dockerfile src/Dockerfile
-
     cd src
-    find provision/scripts/ -type f | sort | \
+    cp generators/fileparts/dockerfile/start Dockerfile
+
+    find provisioners/scripts/ -type f -name '*.sh' | sort | \
     while read file; do
         dst="/tmp/$(basename "$file")"
-        printf '\nCOPY ./%s %s\nRUN bash %s \\\n && rm %s \\\n && rm -rf /var/lib/apt/lists/*\n' "$file" "$dst" "$dst" "$dst" >> Dockerfile
+        printf '\nCOPY ./%s %s\nRUN bash %s \\\n && rm %s \\\n && rm -rf /var/lib/apt/lists/*\n' \
+            "$file" "$dst" "$dst" "$dst" \
+            >> Dockerfile
     done
 
-    test ! -f ../Dockerfile.end || cat <(printf '\n') ../Dockerfile.end >> Dockerfile
+    test ! -f generators/fileparts/dockerfile/end || cat <(printf '\n') generators/fileparts/dockerfile/end >> Dockerfile
 
-    img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+    DOCKER_IMAGE="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
     test -z "$only_build_dockerfile" || exit 0
-    test -z "$use_remote_cache" || docker pull "$img"
+    test -z "$use_remote_cache" || docker pull "$DOCKER_IMAGE"
+    HASH1=$(docker images -q "$DOCKER_IMAGE")
     docker build \
-        $( test -z "$use_remote_cache" || printf '--cache-from %s' "$img" ) \
-        -t "$img" \
+        $( test -z "$use_remote_cache" || printf '--cache-from %s' "$DOCKER_IMAGE" ) \
+        -t "$DOCKER_IMAGE" \
         .
+    [ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || docker rmi "$HASH1"
 )

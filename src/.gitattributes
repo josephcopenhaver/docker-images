@@ -1,0 +1,3 @@
+# Don't let git diff show generated files
+
+Dockerfile -diff

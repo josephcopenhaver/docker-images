@@ -5,7 +5,9 @@ echo install base python runtime
     apt-get update
 
     apt-get install -y python-setuptools
+
     command -v pip || easy_install pip
+
     pip install -U \
         pip \
         pipenv

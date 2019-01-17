@@ -1,2 +1,4 @@
 ./.dockerignore
 ./README.md
+./.gitattributes
+./generators/
