@@ -1,4 +1,4 @@
-echo install basic linux packages
+echo install vagrant ssh support
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
