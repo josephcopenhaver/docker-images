@@ -12,7 +12,7 @@ docker run --rm -d \
     --security-opt seccomp:unconfined \
     --cap-add sys_admin \
     --privileged=true \
-    $img
+    "$img"
 
 function control_c() {
     set -x
@@ -32,13 +32,14 @@ while :; do
     set +x
     ssh \
         -i .ssh_key \
-        -p $local_ssh_port \
+        -p "$local_ssh_port" \
         -o IdentitiesOnly=yes \
         -o PasswordAuthentication=no \
         -o UserKnownHostsFile=/dev/null \
         -o StrictHostKeyChecking=no \
         vagrant@127.0.0.1
     prompt="Kill container: $name ? (y/n)"
+    reset
     echo "$prompt"
     while read -r response; do
         if [[ "$response" =~ ^(y|Y|n|N)$ ]]; then

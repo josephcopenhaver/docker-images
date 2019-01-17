@@ -4,6 +4,10 @@ echo install basic linux packages
 
     apt-get update
 
+    apt-get install -y locales
+    sed -i -r 's/^\s*#\s*en_US\.UTF-8\s+UTF-8\s*$/en_US.UTF-8 UTF-8/g' /etc/locale.gen
+    locale-gen
+
     apt-get install -y \
         apt-transport-https \
         ca-certificates \
