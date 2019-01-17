@@ -3,6 +3,7 @@
     set -exo pipefail
 
     use_remote_cache="$1"
+    only_build_dockerfile="$2"
 
     cp Dockerfile src/Dockerfile
 
@@ -10,12 +11,13 @@
     find provision/scripts/ -type f | sort | \
     while read file; do
         dst="/tmp/$(basename "$file")"
-        printf '\nCOPY ./%s %s\nRUN bash %s \\\n && rm %s\\\n && rm -rf /var/lib/apt/lists/*\n' "$file" "$dst" "$dst" "$dst" >> Dockerfile
+        printf '\nCOPY ./%s %s\nRUN bash %s \\\n && rm %s \\\n && rm -rf /var/lib/apt/lists/*\n' "$file" "$dst" "$dst" "$dst" >> Dockerfile
     done
 
     test ! -f ../Dockerfile.end || cat <(printf '\n') ../Dockerfile.end >> Dockerfile
 
     img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+    test -z "$only_build_dockerfile" || exit 0
     test -z "$use_remote_cache" || docker pull "$img"
     docker build \
         $( test -z "$use_remote_cache" || printf '--cache-from %s' "$img" ) \
