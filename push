@@ -2,6 +2,7 @@
 set -exo pipefail
 
 BRANCH=$(git symbolic-ref HEAD 2>/dev/null | cut -c12-)
+tag=''
 
 if [[ "$BRANCH" == "release/"* ]]; then
     if ! [[ "$BRANCH" =~ ^release\/[a-z0-9._-]+$ ]]; then
@@ -13,10 +14,9 @@ if [[ "$BRANCH" == "release/"* ]]; then
         exit 1
     fi
     tag="$(printf '%s' "$BRANCH" | cut -c9-)-latest"
-    git tag -d "$tag" || true
-    git tag "$tag"
-    git push
-    git push "$(git remote show)" "$tag"
-else
-    git push
+    git tag -f "$tag"
 fi
+
+git push
+
+[ -z "$tag" ] || git push -f "$(git remote show)" "$tag"

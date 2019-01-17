@@ -1,0 +1,12 @@
+#!/bin/bash
+(
+    set -exo pipefail
+
+    cd src
+    img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+    docker pull "$img" || true
+    docker build \
+        --cache-from "$img" \
+        -t "$img" \
+        .
+)
