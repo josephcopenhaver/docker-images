@@ -1,0 +1,53 @@
+#!/bin/bash
+set -exo pipefail
+
+version="${1:-latest}"
+img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-$version"
+name="josephcopenhaver-$(basename "${img#*:}")"
+local_ssh_port=2222
+
+docker run --rm -d \
+    -p 127.0.0.1:$local_ssh_port:22 \
+    --name "$name" \
+    --security-opt seccomp:unconfined \
+    --cap-add sys_admin \
+    --privileged=true \
+    $img
+
+function control_c() {
+    set -x
+    docker stop "$name"
+    exit 0
+}
+
+trap control_c SIGINT
+trap control_c SIGTERM
+
+set +eo pipefail
+
+while :; do
+    set -x
+    install -m 0600 /dev/null .ssh_key
+    docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "$HOME/.ssh/id_rsa" || ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -q -N "" && install -m 0600 "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/authorized_keys") && cat "$HOME/.ssh/id_rsa"' >> .ssh_key
+    set +x
+    ssh \
+        -i .ssh_key \
+        -p $local_ssh_port \
+        -o IdentitiesOnly=yes \
+        -o PasswordAuthentication=no \
+        -o UserKnownHostsFile=/dev/null \
+        -o StrictHostKeyChecking=no \
+        vagrant@127.0.0.1
+    prompt="Kill container: $name ? (y/n)"
+    echo "$prompt"
+    while read -r response; do
+        if [[ "$response" =~ ^(y|Y|n|N)$ ]]; then
+            if [[ "$response" =~ ^(y|Y)$ ]]; then
+                control_c
+            else
+                break
+            fi
+        fi
+        echo "$prompt"
+    done
+done
