@@ -75,6 +75,11 @@ RUN bash /tmp/14_install_jsonlint.sh \
  && rm /tmp/14_install_jsonlint.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/15_install_crystal_version_manager.sh /tmp/15_install_crystal_version_manager.sh
+RUN bash /tmp/15_install_crystal_version_manager.sh \
+ && rm /tmp/15_install_crystal_version_manager.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]
