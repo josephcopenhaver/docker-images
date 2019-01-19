@@ -80,6 +80,11 @@ RUN bash /tmp/15_install_crystal_version_manager.sh \
  && rm /tmp/15_install_crystal_version_manager.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/16_install_java_version_manager.sh /tmp/16_install_java_version_manager.sh
+RUN bash /tmp/16_install_java_version_manager.sh \
+ && rm /tmp/16_install_java_version_manager.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]

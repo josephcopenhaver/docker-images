@@ -11,7 +11,7 @@ echo install node version manager
         cd "$NVM_DIR"
         git fetch origin
         latest_nvm_release="v0.34.0"
-        # latest_nvm_release="$(cd "$NVM_DIR" ; git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))"
+        # latest_nvm_release="$(cd "$NVM_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))"
         git checkout -f "$latest_nvm_release"
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
