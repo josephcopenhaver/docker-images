@@ -90,6 +90,11 @@ RUN bash /tmp/17_install_google_chrome.sh \
  && rm /tmp/17_install_google_chrome.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/98_install_circleci_cli.sh /tmp/98_install_circleci_cli.sh
+RUN bash /tmp/98_install_circleci_cli.sh \
+ && rm /tmp/98_install_circleci_cli.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/99_install_docker.sh /tmp/99_install_docker.sh
 RUN bash /tmp/99_install_docker.sh \
  && rm /tmp/99_install_docker.sh \
