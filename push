@@ -10,7 +10,7 @@ if [[ "$BRANCH" == "release/"* ]]; then
         exit 1
     fi
     if [[ "$BRANCH" == *"-latest" ]]; then
-        echo "Invalid branch name, must not end in --latest"
+        echo "Invalid branch name, must not end in -latest"
         exit 1
     fi
     tag="$(printf '%s' "$BRANCH" | cut -c9-)-latest"
