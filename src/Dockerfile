@@ -85,6 +85,16 @@ RUN bash /tmp/16_install_java_version_manager.sh \
  && rm /tmp/16_install_java_version_manager.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/17_install_google_chrome.sh /tmp/17_install_google_chrome.sh
+RUN bash /tmp/17_install_google_chrome.sh \
+ && rm /tmp/17_install_google_chrome.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/99_install_docker.sh /tmp/99_install_docker.sh
+RUN bash /tmp/99_install_docker.sh \
+ && rm /tmp/99_install_docker.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]
