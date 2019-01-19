@@ -55,6 +55,11 @@ RUN bash /tmp/10_install_ruby.sh \
  && rm /tmp/10_install_ruby.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/11_install_rust.sh /tmp/11_install_rust.sh
+RUN bash /tmp/11_install_rust.sh \
+ && rm /tmp/11_install_rust.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]
