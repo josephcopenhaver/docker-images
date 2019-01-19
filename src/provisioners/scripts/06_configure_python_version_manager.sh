@@ -1,6 +1,9 @@
 echo configure python version manager
 (
+    set -exo pipefail
+
     sudo -u vagrant bash <<'EOF'
+
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
         curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
