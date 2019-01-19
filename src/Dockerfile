@@ -50,6 +50,11 @@ RUN bash /tmp/09_install_yarn_npm_package.sh \
  && rm /tmp/09_install_yarn_npm_package.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/10_install_ruby.sh /tmp/10_install_ruby.sh
+RUN bash /tmp/10_install_ruby.sh \
+ && rm /tmp/10_install_ruby.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]
