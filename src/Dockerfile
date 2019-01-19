@@ -60,6 +60,21 @@ RUN bash /tmp/11_install_rust.sh \
  && rm /tmp/11_install_rust.sh \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/12_install_yamllint.sh /tmp/12_install_yamllint.sh
+RUN bash /tmp/12_install_yamllint.sh \
+ && rm /tmp/12_install_yamllint.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/13_install_cfn_lint.sh /tmp/13_install_cfn_lint.sh
+RUN bash /tmp/13_install_cfn_lint.sh \
+ && rm /tmp/13_install_cfn_lint.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/14_install_jsonlint.sh /tmp/14_install_jsonlint.sh
+RUN bash /tmp/14_install_jsonlint.sh \
+ && rm /tmp/14_install_jsonlint.sh \
+ && rm -rf /var/lib/apt/lists/*
+
 STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/sbin/init" ]
