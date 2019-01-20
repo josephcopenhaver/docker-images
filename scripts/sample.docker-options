@@ -1,0 +1,14 @@
+# real file = .docker-options
+#
+# use this file to add additional mount options to the docker run command
+# such as mounting in secrets files and additional directories as the vagrant user
+
+# files such as ~/.bashrc.local and ~/.bashrc.noninteractive.local
+# are already managed buy the run script and initialized automatically
+# from sample-state/sample* basis files
+# once initialized you can customize there to add more configs and secrets
+# if you prefer to duplicate values rather than mount in local files
+
+# AWS SECRETS
+-v "$HOME/.aws/credentials:/home/vagrant/.aws/credentials:ro"
+-v "$HOME/.aws/config:/home/vagrant/.aws/config:ro"

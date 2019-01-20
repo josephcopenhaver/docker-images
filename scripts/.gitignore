@@ -1,3 +1,4 @@
 /.ssh_key
 /.ssh-options
+/.docker-options
 /.state

@@ -48,6 +48,7 @@
         --privileged=true \
         -v "$STATE_DIR/.bash_history:/home/vagrant/.bash_history" \
         -v "$STATE_DIR/.bashrc.local:/home/vagrant/.bashrc.local" \
+        $(test ! -s "$DIR/.docker-options" || eval "printf '%s' \"$(cat "$DIR/.docker-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ')\"" ) \
         "$img"
 
     function control_c() {
