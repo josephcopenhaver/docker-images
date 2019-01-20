@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install ruby
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

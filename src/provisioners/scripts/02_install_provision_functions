@@ -1,9 +1,16 @@
+#!/bin/bash
 echo Install provision bash functions
 (
     set -exo pipefail
 
     cat <<'EOF' | install -m 0666 /dev/stdin /etc/provision_functions
 bashrc_initialize_provisioning() {
+    local set_x=''
+    if [[ "$-" == *"x"* ]]; then
+        set_x=y
+        set +x
+    fi
+
     test ! -f ~/.bashrc.noninteractive || return
     cp -a ~/.bashrc ~/.bashrc.old
     truncate -cs0 ~/.bashrc
@@ -16,9 +23,17 @@ bashrc_initialize_provisioning() {
         >> ~/.bashrc
     install -m 0600 /dev/null ~/.bashrc.noninteractive
     rm ~/.bashrc.old
+
+    [ -z "$set_x" ] || set -x
 }
 
 bashrc_add_noninteractive() {
+    local set_x=''
+    if [[ "$-" == *"x"* ]]; then
+        set_x=y
+        set +x
+    fi
+
     install -m 0600 /dev/null ~/.bashrc.new_noninteractive_section
     while read line; do
       printf '%s\n' "$line" >> ~/.bashrc.new_noninteractive_section
@@ -26,21 +41,28 @@ bashrc_add_noninteractive() {
     cat ~/.bashrc.new_noninteractive_section >> ~/.bashrc.noninteractive
     . ~/.bashrc.new_noninteractive_section
     rm ~/.bashrc.new_noninteractive_section
+
+    [ -z "$set_x" ] || set -x
 }
 
 bashrc_add_interactive() {
+    local set_x=''
+    if [[ "$-" == *"x"* ]]; then
+        set_x=y
+        set +x
+    fi
+
     install -m 0600 /dev/null ~/.bashrc.new_interactive_section
     while read line; do
       printf '%s\n' "$line" >> ~/.bashrc.new_interactive_section
     done
     cat ~/.bashrc.new_interactive_section >> ~/.bashrc
-    noninteractive=''
-    case $- in
-        *i*) ;;
-        *) noninteractive='y';;
-    esac
-    test -n "$noninteractive" || . ~/.bashrc.new_interactive_section
+    if [[ "$-" == *"i"* ]]; then
+        . ~/.bashrc.new_interactive_section
+    fi
     rm ~/.bashrc.new_interactive_section
+
+    [ -z "$set_x" ] || set -x
 }
 EOF
 

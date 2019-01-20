@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install basic linux packages
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

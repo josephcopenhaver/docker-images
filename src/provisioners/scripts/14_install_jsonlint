@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install jsonlint from nodejs packages
 (
     set -exo pipefail

@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install base python runtime
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

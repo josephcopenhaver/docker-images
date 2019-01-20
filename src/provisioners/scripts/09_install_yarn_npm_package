@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install yarn npm package
 (
     set -exo pipefail

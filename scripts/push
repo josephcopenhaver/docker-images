@@ -1,0 +1,24 @@
+#!/bin/bash
+(
+    set -exo pipefail
+
+    BRANCH=$(git symbolic-ref HEAD 2>/dev/null | cut -c12-)
+    tag=''
+
+    if [[ "$BRANCH" == "release/"* ]]; then
+        if ! [[ "$BRANCH" =~ ^release\/[a-z0-9._-]+$ ]]; then
+            echo 'Invalid branch name, must match regex: /^release\/[a-z0-9._-]+$/'
+            exit 1
+        fi
+        if [[ "$BRANCH" == *"-latest" ]]; then
+            echo "Invalid branch name, must not end in -latest"
+            exit 1
+        fi
+        tag="$(printf '%s' "$BRANCH" | cut -c9-)-latest"
+        git tag -f "$tag"
+    fi
+
+    git push
+
+    [ -z "$tag" ] || git push -f "$(git remote show)" "$tag"
+)

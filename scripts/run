@@ -1,0 +1,73 @@
+#!/bin/bash
+(
+    set -eo pipefail
+
+    version="${1:-latest}"
+
+    # Get absolute path to current script parent dir and save to DIR
+    SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+        DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+        SOURCE="$(readlink "$SOURCE")"
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+    done
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+    set -x
+
+    img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-$version"
+    name="josephcopenhaver-$(basename "${img#*:}")"
+    prompt="Kill container: $name ? (y/n)"
+    local_ssh_port=2222
+
+    docker run --rm -d \
+        -p 127.0.0.1:$local_ssh_port:22 \
+        --name "$name" \
+        --security-opt seccomp:unconfined \
+        --cap-add sys_admin \
+        --privileged=true \
+        "$img"
+
+    function control_c() {
+        set -x
+        docker stop "$name"
+        exit 0
+    }
+
+    trap control_c SIGINT
+    trap control_c SIGTERM
+
+    set +eo pipefail
+
+    ssh_keyfile="$DIR/.ssh_key"
+
+    while :; do
+        set -x
+        install -m 0600 /dev/null "$ssh_keyfile"
+        docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "$HOME/.ssh/id_rsa" || ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -q -N "" && install -m 0600 "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/authorized_keys") && cat "$HOME/.ssh/id_rsa"' >> "$ssh_keyfile"
+        set +x
+
+        ssh \
+            -i "$ssh_keyfile" \
+            -p "$local_ssh_port" \
+            -o IdentitiesOnly=yes \
+            -o PasswordAuthentication=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o StrictHostKeyChecking=no \
+            vagrant@127.0.0.1
+
+        reset
+        echo "$prompt"
+
+        while read -r response; do
+            if [[ "$response" =~ ^(y|Y|n|N)$ ]]; then
+                if [[ "$response" =~ ^(y|Y)$ ]]; then
+                    control_c
+                else
+                    break
+                fi
+            fi
+            echo "$prompt"
+        done
+    done
+)

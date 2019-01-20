@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install cfn-lint from https://github.com/awslabs/cfn-python-lint
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

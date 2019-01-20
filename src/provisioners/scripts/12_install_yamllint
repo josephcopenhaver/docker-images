@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install yamllint from https://github.com/adrienverge/yamllint
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

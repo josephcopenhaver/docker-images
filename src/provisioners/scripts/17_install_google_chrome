@@ -1,3 +1,4 @@
+#!/bin/bash
 echo install google chrome
 (
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
