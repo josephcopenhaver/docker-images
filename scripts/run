@@ -20,12 +20,19 @@
     prompt="Kill container: $name ? (y/n)"
     local_ssh_port=2222
 
+    STATE_DIR="$DIR/.state"
+    mkdir -p "$STATE_DIR"
+    test -e "$STATE_DIR/.bash_history" || touch "$STATE_DIR/.bash_history"
+    test -e "$STATE_DIR/.bashrc.local" || touch "$STATE_DIR/.bashrc.local"
+
     docker run --rm -d \
         -p 127.0.0.1:$local_ssh_port:22 \
         --name "$name" \
         --security-opt seccomp:unconfined \
         --cap-add sys_admin \
         --privileged=true \
+        -v "$STATE_DIR/.bash_history:/home/vagrant/.bash_history" \
+        -v "$STATE_DIR/.bashrc.local:/home/vagrant/.bashrc.local" \
         "$img"
 
     function control_c() {
@@ -54,6 +61,7 @@
             -o PasswordAuthentication=no \
             -o UserKnownHostsFile=/dev/null \
             -o StrictHostKeyChecking=no \
+            $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
             vagrant@127.0.0.1
 
         reset

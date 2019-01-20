@@ -1,0 +1,6 @@
+# This is a sample "ssh-options" file
+# the real file can have comments as well
+# real file name = .ssh-options
+
+# Enable rmate/rcode vscode editing of guest files on local host
+-R 52698:127.0.0.1:52698
