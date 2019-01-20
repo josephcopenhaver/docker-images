@@ -1,0 +1,10 @@
+# real file = /scripts/.state/.bashrc.local
+
+# stores cosmetic enhancements for human use not provided by the OS by default
+# if you want enhancements that are for noninteractive use then use .bashrc.noninteractive.local
+
+alias git-sha='git log -1 --format="%H"'
+alias predate="bash -c 'while IFS='' read -r line || [[ -n \"\$line\" ]]; do printf '\\''[%s] %s\\n'\\'' \"\`date -u \"+%Y-%m-%d %H:%M:%S\"\`\" \"\$line\"; done'"
+
+# always keep this line last
+export PS1='`printf "%02X" $?`:\w `git branch 2> /dev/null | grep -E ^* | sed -E s/^\\\\\*\ \(.+\)$/\(\\\\\1\)\ /`\$ '

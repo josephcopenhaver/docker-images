@@ -23,7 +23,22 @@
     STATE_DIR="$DIR/.state"
     mkdir -p "$STATE_DIR"
     test -e "$STATE_DIR/.bash_history" || touch "$STATE_DIR/.bash_history"
-    test -e "$STATE_DIR/.bashrc.local" || touch "$STATE_DIR/.bashrc.local"
+
+    if [ ! -s "$STATE_DIR/.bashrc.local" ]; then
+        if [ -s "$DIR/sample-state/sample.bashrc.local" ]; then
+            cp "$DIR/sample-state/sample.bashrc.local" "$STATE_DIR/.bashrc.local"
+        else
+            touch "$STATE_DIR/.bashrc.local"
+        fi
+    fi
+
+    if [ ! -s "$STATE_DIR/.bashrc.noninteractive.local" ]; then
+        if [ -s "$DIR/sample-state/sample.bashrc.noninteractive.local" ]; then
+            cp "$DIR/sample-state/sample.bashrc.noninteractive.local" "$STATE_DIR/.bashrc.noninteractive.local"
+        else
+            touch "$STATE_DIR/.bashrc.noninteractive.local"
+        fi
+    fi
 
     docker run --rm -d \
         -p 127.0.0.1:$local_ssh_port:22 \
