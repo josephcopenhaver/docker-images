@@ -1,4 +1,6 @@
-# real file = .docker-options
+# This is a sample "docker-options" file
+# the real file can have comments as well
+# real file name = .docker-options
 #
 # use this file to add additional mount options to the docker run command
 # such as mounting in secrets files and additional directories as the vagrant user

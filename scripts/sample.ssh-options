@@ -4,3 +4,15 @@
 
 # Enable rmate/rcode vscode editing of guest files on local host
 -R 52698:127.0.0.1:52698
+
+# Allow the linux xwindow system to forward to the host's xwindow listening tcp socket 6000
+#
+# combine this with setting the docker env variable:
+#     DISPLAY=127.0.0.1:0
+#
+# and running quartz on mac with socat in the background:
+#     socat TCP-LISTEN:6000,reuseaddr,fork,range=127.0.0.1/32 UNIX-CLIENT:\"$DISPLAY\"
+#
+# notice that everything is limited to localhost interface 127.0.0.1
+# so it should be relativelt secure
+-R 6000:127.0.0.1:6000

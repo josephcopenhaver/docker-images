@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install google chrome
 (
+    # inspired from https://github.com/jessfraz/dockerfiles/blob/master/chrome/stable/Dockerfile
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     chrome_version="=71.0.3578.98-1"
@@ -15,4 +16,8 @@ echo install google chrome
     apt-get update
 
     apt-get install -y "google-chrome-stable$chrome_version"
+
+    # grant user more permissions required to run chrome
+    usermod -a -G audio,video vagrant
+    sudo -u vagrant bash -c 'mkdir -p ~/Downloads'
 )
