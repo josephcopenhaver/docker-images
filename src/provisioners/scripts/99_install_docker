@@ -15,5 +15,10 @@ echo install docker
 
     apt-get install -y "docker-ce$version"
 
+    pip install docker-compose
+
+    # verify installation of docker-compose works
+    docker-compose version
+
     usermod -a -G docker vagrant
 )

@@ -93,6 +93,11 @@ RUN /tmp/17_install_google_chrome \
  && rm /tmp/17_install_google_chrome \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/18_install_mysql_client /tmp/18_install_mysql_client
+RUN /tmp/18_install_mysql_client \
+ && rm /tmp/18_install_mysql_client \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_circleci_cli /tmp/98_install_circleci_cli
 RUN /tmp/98_install_circleci_cli \
  && rm /tmp/98_install_circleci_cli \
