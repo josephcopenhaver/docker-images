@@ -14,3 +14,6 @@
 # AWS SECRETS
 -v "$HOME/.aws/credentials:/home/vagrant/.aws/credentials:ro"
 -v "$HOME/.aws/config:/home/vagrant/.aws/config:ro"
+
+# SSH KEYS
+-v "$HOME/.ssh/:/home/vagrant/.ssh/:ro"
