@@ -21,4 +21,19 @@ echo install docker
     docker-compose version
 
     usermod -a -G docker vagrant
+
+    # install bash completion for docker-compose
+    sudo -u vagrant bash <<'EOF'
+        set -eo pipefail ; . /etc/provision_functions ; set -x
+
+        version="$(docker-compose --version | sed -E 's/^.* version ([0-9.]+).*$/\1/')"
+        file="$HOME/.bash_completions.d/docker-compose-$version"
+
+        curl -fsSL https://raw.githubusercontent.com/docker/compose/$version/contrib/completion/bash/docker-compose -o "$file"
+
+        bashrc_add_interactive <<BASHRC_EOF
+[ ! -s "$file" ] || . "$file"
+BASHRC_EOF
+
+EOF
 )

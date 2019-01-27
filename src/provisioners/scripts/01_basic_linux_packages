@@ -16,6 +16,7 @@ echo install basic linux packages
         software-properties-common \
         rsync \
         bash \
+        bash-completion \
         make \
         jq \
         openssh-client \

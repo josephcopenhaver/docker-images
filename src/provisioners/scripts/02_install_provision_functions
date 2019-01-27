@@ -24,6 +24,8 @@ bashrc_initialize_provisioning() {
     install -m 0600 /dev/null ~/.bashrc.noninteractive
     rm ~/.bashrc.old
 
+    mkdir -p "$HOME/.bash_completions.d"
+
     [ -z "$set_x" ] || set -x
 }
 

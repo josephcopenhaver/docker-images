@@ -98,6 +98,16 @@ RUN /tmp/18_install_mysql_client \
  && rm /tmp/18_install_mysql_client \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/19_install_postgres_client /tmp/19_install_postgres_client
+RUN /tmp/19_install_postgres_client \
+ && rm /tmp/19_install_postgres_client \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/20_install_redis_cli /tmp/20_install_redis_cli
+RUN /tmp/20_install_redis_cli \
+ && rm /tmp/20_install_redis_cli \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_circleci_cli /tmp/98_install_circleci_cli
 RUN /tmp/98_install_circleci_cli \
  && rm /tmp/98_install_circleci_cli \
