@@ -1,8 +1,18 @@
 #!/bin/bash
+
+{
+
+# The extra curly braces and "} && exit $?" protect against editing of the script
+# affecting runtimes that have already started. Without this change there is a risk
+# of the script breaking after the user leaves the ssh session. This is bad, we need
+# to cleanup the container reliably and the script will change over time.
+
 (
     set -eo pipefail
 
     version="${1:-latest}"
+    suffix="$2"
+    [ -n "$suffix" ] && suffix="-$suffix"
 
     # Get absolute path to current script parent dir and save to DIR
     SOURCE="${BASH_SOURCE[0]}"
@@ -16,7 +26,7 @@
     set -x
 
     img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-$version"
-    name="josephcopenhaver-$(basename "${img#*:}")"
+    name="josephcopenhaver-$(basename "${img#*:}")$suffix"
     prompt="Kill container: $name ? (y/n)"
     local_ssh_port=2222
 
@@ -51,6 +61,8 @@
         $(test ! -s "$DIR/.docker-options" || eval "printf '%s' \"$(cat "$DIR/.docker-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ')\"" ) \
         "$img"
 
+    set +x
+
     function control_c() {
         set -x
         docker stop "$name"
@@ -60,14 +72,14 @@
     trap control_c SIGINT
     trap control_c SIGTERM
 
-    set +eo pipefail
-
     remote_keyfile_dir='$HOME/.ssh.vagrant' # intentionally escaping $HOME variable
     ssh_keyfile="$DIR/.ssh_key"
     connect_seconds_valid=5
     connect_max_tries=10
     connect_attempt=0
     connected=''
+
+    set +eo pipefail
 
     while :; do
         while :; do
@@ -122,3 +134,5 @@
         done
     done
 )
+
+} && exit $?
