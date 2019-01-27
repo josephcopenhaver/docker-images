@@ -81,6 +81,11 @@
             docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "$HOME/.ssh/id_rsa" || ssh-keygen -t rsa -b 4096 -f "$HOME/.ssh/id_rsa" -q -N "" && install -m 0600 "$HOME/.ssh/id_rsa.pub" "$HOME/.ssh/authorized_keys") && cat "$HOME/.ssh/id_rsa"' >> "$ssh_keyfile"
             [ ! -s "$ssh_keyfile" ] && sleep 1 && continue
             set +x
+
+            # You cannot use the exit code of ssh to determine if a connection was successful.
+            # By default ssh exits with the error code of the last command ran in the remote's
+            # shell. Going to time how long the ssh command took to return instead.
+
             start_seconds="$SECONDS"
             ssh \
                 -i "$ssh_keyfile" \
@@ -92,6 +97,7 @@
                 $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
                 vagrant@127.0.0.1
             seconds_elapsed=$(( $SECONDS - $start_seconds ))
+
             if [[ $seconds_elapsed -ge $connect_seconds_valid ]]; then
                 connected='y'
                 connect_attempt=0
