@@ -1,4 +1,5 @@
 #!/bin/bash
+{
 (
     set -eo pipefail
 
@@ -27,3 +28,4 @@
     test ! -f generators/fileparts/dockerfile/end || cat <(printf '\n') generators/fileparts/dockerfile/end >> Dockerfile
 
 )
+} && exit $?

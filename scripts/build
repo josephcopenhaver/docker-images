@@ -1,4 +1,5 @@
 #!/bin/bash
+{
 (
     set -eo pipefail
 
@@ -34,3 +35,4 @@
 
     [ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || docker rmi "$HASH1"
 )
+} && exit $?

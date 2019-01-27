@@ -83,6 +83,7 @@
 
     while :; do
         while :; do
+            loop_start_seconds="$SECONDS"
             connect_attempt=$(( $connect_attempt + 1 ))
             if [[ $connect_attempt -gt $connect_max_tries ]]; then
                 connect_attempt=0
@@ -93,7 +94,9 @@
             install -m 0600 /dev/null "$ssh_keyfile"
             docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") && cat "'"$remote_keyfile_dir"'/id_rsa"' >> "$ssh_keyfile"
             set +x
-            [ ! -s "$ssh_keyfile" ] && sleep 1 && continue
+            [ ! -s "$ssh_keyfile" ] \
+                && ( [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1 ) \
+                && continue
 
             # You cannot use the exit code of ssh to determine if a connection was successful.
             # By default ssh exits with the error code of the last command ran in the remote's
@@ -109,17 +112,18 @@
                 -o StrictHostKeyChecking=no \
                 $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
                 vagrant@127.0.0.1
-            seconds_elapsed=$(( $SECONDS - $start_seconds ))
 
-            if [[ $seconds_elapsed -ge $connect_seconds_valid ]]; then
+            if [[ $(( $SECONDS - $start_seconds )) -ge $connect_seconds_valid ]]; then
                 connected='y'
                 connect_attempt=0
             fi
             [ -n "$connected" ] && break
-            [[ $seconds_elapsed -lt 1 ]] && sleep 1
+            [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1
         done
 
-        reset
+        # calling reset while within a visual studio code terminal window deletes output history
+        # best to just avoid making a decision for the developer
+        # reset
         echo "$prompt"
 
         while read -r response; do
