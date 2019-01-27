@@ -17,4 +17,11 @@ echo install vagrant ssh support
     install -m 0700 <(printf '%s' 'vagrant  ALL=(ALL:ALL)       NOPASSWD: ALL') /etc/sudoers.d/01_allow_vagrant_sudo
 
     sudo -u vagrant bash -c 'set -eo pipefail ; . /etc/provision_functions ; set -x ; bashrc_initialize_provisioning ;'
+
+    # Move AuthorizedKeysFile from ~/.ssh to ~/.ssh.vagrant directory
+    # so people can mount ~/.ssh from their local systems
+
+    sed -i -E 's/^\s*#?\s*AuthorizedKeysFile\s+.*/AuthorizedKeysFile    .ssh.vagrant\/authorized_keys/' /etc/ssh/sshd_config
+    grep -qF -- "AuthorizedKeysFile    .ssh.vagrant/authorized_keys" "/etc/ssh/sshd_config"
+    sudo -u vagrant bash -c 'set -exo pipefail ; mv ~/.ssh ~/.ssh.vagrant'
 )
