@@ -1,0 +1,10 @@
+#!/bin/bash
+echo install mysql client
+(
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+
+    apt-get install -y \
+        mysql-client
+)

@@ -1,0 +1,13 @@
+#!/bin/bash
+echo install mysql client
+(
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+
+    # workaround manpage installation step that files due to parent directory not existing
+    mkdir -p /usr/share/man/man7
+
+    apt-get install -y \
+        postgresql-client
+)
