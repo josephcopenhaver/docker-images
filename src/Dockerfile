@@ -108,6 +108,16 @@ RUN /tmp/20_install_redis_cli \
  && rm /tmp/20_install_redis_cli \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/21_install_adr /tmp/21_install_adr
+RUN /tmp/21_install_adr \
+ && rm /tmp/21_install_adr \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/22_install_nginx /tmp/22_install_nginx
+RUN /tmp/22_install_nginx \
+ && rm /tmp/22_install_nginx \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_circleci_cli /tmp/98_install_circleci_cli
 RUN /tmp/98_install_circleci_cli \
  && rm /tmp/98_install_circleci_cli \
