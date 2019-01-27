@@ -4,6 +4,8 @@ echo install nginx
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
+
+    version="=1.10.3-1+deb9u2"
     apt-get install -y \
-        nginx=1.10.3-1+deb9u2
+        "nginx$version"
 )
