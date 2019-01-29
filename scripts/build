@@ -22,7 +22,7 @@
 
     cd ../src
 
-    DOCKER_IMAGE="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+    DOCKER_IMAGE="josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
 
     test -z "$use_remote_cache" || docker pull "$DOCKER_IMAGE"
 
@@ -33,6 +33,9 @@
         -t "$DOCKER_IMAGE" \
         .
 
-    [ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || docker rmi "$HASH1"
+    [ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || (
+        docker rmi "$HASH1" || true
+        echo 'Unused images could still exist. You should run "docker image prune"'
+    )
 )
 } && exit $?
