@@ -10,6 +10,7 @@ echo install basic linux packages
     locale-gen
 
     apt-get install -y \
+        coreutils \
         apt-transport-https \
         ca-certificates \
         gnupg2 \
@@ -30,6 +31,9 @@ echo install basic linux packages
         vim \
         procps \
         htop \
+        iotop \
+        time \
+        expect \
         netcat \
         git \
         tmux \
