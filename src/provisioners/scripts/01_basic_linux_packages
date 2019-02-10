@@ -36,6 +36,8 @@ echo install basic linux packages
         expect \
         netcat \
         git \
+        ftp \
+        ncftp \
         tmux \
         tmate \
         build-essential
