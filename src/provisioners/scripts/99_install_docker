@@ -36,4 +36,10 @@ echo install docker
 BASHRC_EOF
 
 EOF
+
+    mkdir -p /etc/services.d/dockerd
+    cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/dockerd/run
+#!/usr/bin/execlineb -P
+/usr/bin/dockerd
+EOF
 )

@@ -6,4 +6,5 @@ RUN echo 'First apt-get upgrade ran on `date +%s`=1547959363' \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update \
  && apt-get install bash \
- && apt-get upgrade -y
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/*

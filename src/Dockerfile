@@ -6,7 +6,8 @@ RUN echo 'First apt-get upgrade ran on `date +%s`=1547959363' \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update \
  && apt-get install bash \
- && apt-get upgrade -y
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/*
 
 COPY ./provisioners/scripts/01_basic_linux_packages /tmp/01_basic_linux_packages
 RUN /tmp/01_basic_linux_packages \
@@ -130,4 +131,4 @@ RUN /tmp/99_install_docker \
 
 STOPSIGNAL SIGRTMIN+3
 
-ENTRYPOINT [ "/sbin/init" ]
+ENTRYPOINT [ "/init" ]

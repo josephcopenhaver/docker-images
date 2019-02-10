@@ -7,8 +7,7 @@ echo install vagrant ssh support
 
     apt-get install -y \
         sudo \
-        openssh-server \
-        systemd-sysv
+        openssh-server
 
     groupadd vagrant
     useradd -d /home/vagrant -m -s `which bash` -g vagrant vagrant
@@ -24,4 +23,13 @@ echo install vagrant ssh support
     sed -i -E 's/^\s*#?\s*AuthorizedKeysFile\s+.*/AuthorizedKeysFile    .ssh.vagrant\/authorized_keys/' /etc/ssh/sshd_config
     grep -qF -- "AuthorizedKeysFile    .ssh.vagrant/authorized_keys" "/etc/ssh/sshd_config"
     sudo -u vagrant bash -c 'set -exo pipefail ; mv ~/.ssh ~/.ssh.vagrant'
+
+    mkdir -p /etc/services.d/sshd
+    cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/sshd/run
+#!/bin/bash
+set -exo pipefail
+
+mkdir -p /var/run/sshd
+exec /usr/sbin/sshd -D
+EOF
 )
