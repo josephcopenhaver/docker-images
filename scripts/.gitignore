@@ -2,3 +2,4 @@
 /.ssh-options
 /.docker-options
 /.state
+/.env
