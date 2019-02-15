@@ -7,12 +7,13 @@ echo install rust
 
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        export CARGO_HOME="$HOME/.cargo"
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export CARGO_HOME="$HOME/.cargo"
+BASHRC_EOF
 
         curl -fsSL https://sh.rustup.rs | sh -s -- -y --no-modify-path
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
-export CARGO_HOME="$HOME/.cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
 BASHRC_EOF
 

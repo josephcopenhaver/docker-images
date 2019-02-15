@@ -6,13 +6,20 @@ echo install adr tools
     sudo -u vagrant bash <<'EOF'
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        mkdir "$HOME/.adr-tools"
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export ADR_TOOLS_HOME="$HOME/.adr-tools"
+BASHRC_EOF
+
+        mkdir -p "$ADR_TOOLS_HOME/versions"
 
         version="3.0.0"
-        curl -fsSL https://github.com/npryce/adr-tools/archive/$version.tar.gz | tar zxf - -C "$HOME/.adr-tools" --transform 's/^adr-tools-//'
 
-        bashrc_add_noninteractive <<BASHRC_EOF
-export PATH="\$PATH:\$HOME/.adr-tools/$version/src"
+        curl -fsSL https://github.com/npryce/adr-tools/archive/$version.tar.gz | tar zxf - -C "$ADR_TOOLS_HOME/versions/" --transform 's/^adr-tools-//'
+
+        ln -s "$ADR_TOOLS_HOME/versions/$version/src" "$ADR_TOOLS_HOME/bin"
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export PATH="$PATH:$ADR_TOOLS_HOME/bin"
 BASHRC_EOF
 
 EOF

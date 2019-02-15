@@ -7,7 +7,12 @@ echo install node version manager
 
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        export NVM_DIR="$HOME/.nvm"
+
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export NVM_DIR="$HOME/.nvm"
+BASHRC_EOF
+
         git clone https://github.com/creationix/nvm.git "$NVM_DIR"
         cd "$NVM_DIR"
         git fetch origin
@@ -16,7 +21,6 @@ echo install node version manager
         git checkout -f "$latest_nvm_release"
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
-export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 BASHRC_EOF
 

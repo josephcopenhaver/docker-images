@@ -119,6 +119,11 @@ RUN /tmp/22_install_nginx \
  && rm /tmp/22_install_nginx \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/97_install_kubernetes_tools /tmp/97_install_kubernetes_tools
+RUN /tmp/97_install_kubernetes_tools \
+ && rm /tmp/97_install_kubernetes_tools \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_circleci_cli /tmp/98_install_circleci_cli
 RUN /tmp/98_install_circleci_cli \
  && rm /tmp/98_install_circleci_cli \
