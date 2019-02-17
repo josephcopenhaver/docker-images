@@ -1,0 +1,70 @@
+#!/bin/bash
+
+echo "Buiding image"
+{(
+
+    SOURCE="${BASH_SOURCE[0]}"
+    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+        DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+        SOURCE="$(readlink "$SOURCE")"
+        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+    done
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+    export ORGANIZATION="$(git config --get remote.origin.url | sed -E 's/^.*\/\///; s/^.*:/\//; s/^[^\/]*\///; s/\/.*$//')"
+    export PROJECT=$(git config --get remote.origin.url | sed -E 's/\.git$//; s/^.*\/([^\/]+)/\1/')
+
+    export IMAGE="${IMAGE:-$1}"
+    export VERSION="${VERSION:-latest}"
+    export PULL_CACHE="${PULL_CACHE:-false}"
+    export CACHE_FROM="${CACHE_FROM:-$( [ "$PULL_CACHE" != "true" ] || printf '%s' "$ORGANIZATION/$PROJECT:$IMAGE-$VERSION" )}"
+
+    cat << EOF
+
+IMAGE=$IMAGE
+VERSION=$VERSION
+PULL_CACHE=$PULL_CACHE
+EOF
+
+    set -euxo pipefail
+
+    if [ -z "$IMAGE" ]; then
+        echo 'Please set the environment variable "IMAGE"'
+        exit 1
+    fi
+
+    git fetch origin
+    git checkout "release/$IMAGE"
+    git pull origin "release/$IMAGE"
+    if [ "$VERSION" != "latest" ]; then
+        git checkout "$VERSION"
+    fi
+
+    if [ "$PULL_CACHE" == "true" ]; then
+        docker pull "$CACHE_FROM"
+
+        cat $(dirname "$DIR")/src/Dockerfile \
+            | grep -E '^\s*FROM\s+' \
+            | sed -E 's/^\s*FROM\s+//; s/\s+.*//' \
+            | grep -Ev '^scratch$' \
+            | \
+            while read -r CACHED_IMAGE; do
+                docker pull "$CACHED_IMAGE"
+                if [ -n "$CACHE_FROM" ]; then
+                    export CACHE_FROM="$CACHED_IMAGE,$CACHE_FROM"
+                else
+                    export CACHE_FROM="$CACHED_IMAGE"
+                fi
+            done
+    fi
+
+    cat << EOF
+CACHE_FROM=$CACHE_FROM
+
+EOF
+
+    VERSION="$VERSION" $DIR/build
+
+    git checkout -
+
+)} && exit $?
