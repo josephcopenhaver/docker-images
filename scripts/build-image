@@ -24,6 +24,8 @@ echo "Buiding image"
 IMAGE=$IMAGE
 VERSION=$VERSION
 PULL_CACHE=$PULL_CACHE
+CACHE_FROM=$CACHE_FROM
+
 EOF
 
     set -euxo pipefail
@@ -59,6 +61,7 @@ EOF
     fi
 
     cat << EOF
+
 CACHE_FROM=$CACHE_FROM
 
 EOF
