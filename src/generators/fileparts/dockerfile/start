@@ -1,0 +1,12 @@
+ARG VERSION=1.12.0
+
+FROM golang:${VERSION}
+
+MAINTAINER joseph.copenhaver@gmail.com
+
+RUN echo 'First apt-get upgrade ran on `date +%s`=1552110255' \
+ && export DEBIAN_FRONTEND=noninteractive \
+ && apt-get update \
+ && apt-get install bash \
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/*

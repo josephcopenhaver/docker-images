@@ -1,0 +1,37 @@
+#!/bin/bash
+set -eo pipefail
+
+use_remote_cache="$1"
+
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+set -x
+
+cd "$DIR"
+
+./build-dockerfile
+
+cd ../src
+
+DOCKER_IMAGE="josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+
+test -z "$use_remote_cache" || docker pull "$DOCKER_IMAGE"
+
+HASH1=$(docker images -q "$DOCKER_IMAGE")
+
+docker build \
+    $( test -z "$use_remote_cache" || printf '--cache-from %s' "$DOCKER_IMAGE" ) \
+    -t "$DOCKER_IMAGE" \
+    .
+
+[ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || (
+    docker rmi "$HASH1" || true
+    echo 'Unused images could still exist. You should run "docker image prune"'
+)

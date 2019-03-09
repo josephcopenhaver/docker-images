@@ -1,0 +1,26 @@
+#!/bin/bash
+set -eo pipefail
+
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+set -x
+
+cd "$DIR/../src"
+cp generators/fileparts/dockerfile/start Dockerfile
+
+find provisioners/scripts/ -type f | sort | \
+while read file; do
+    dst="/tmp/$(basename "$file")"
+    printf '\nCOPY ./%s %s\nRUN %s \\\n && rm %s \\\n && rm -rf /var/lib/apt/lists/*\n' \
+        "$file" "$dst" "$dst" "$dst" \
+        >> Dockerfile
+done
+
+test ! -f generators/fileparts/dockerfile/end || cat <(printf '\n') generators/fileparts/dockerfile/end >> Dockerfile
