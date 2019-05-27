@@ -56,11 +56,28 @@
     trap control_c SIGTERM
 
     remote_keyfile_dir='$HOME/.ssh.vagrant' # intentionally escaping $HOME variable
+    ssh_host='127.0.0.1'
     ssh_keyfile="$DIR/.ssh_key"
+    ssh_configfile="$DIR/.state/.ssh_config"
     connect_seconds_valid=5
     connect_max_tries=10
     connect_attempt=0
     connected=''
+
+    cat << EOF | install -m 0600 /dev/stdin "${ssh_configfile}"
+Host ${ssh_host}
+  User vagrant
+  Port ${local_ssh_port}
+  UserKnownHostsFile /dev/null
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  IdentityFile ${ssh_keyfile}
+  StrictHostKeyChecking no
+EOF
+
+    echo ""
+    echo "SSH config file: ${ssh_configfile}"
+    echo ""
 
     set +eo pipefail
 
@@ -87,14 +104,9 @@
 
             start_seconds="$SECONDS"
             ssh \
-                -i "$ssh_keyfile" \
-                -p "$local_ssh_port" \
-                -o IdentitiesOnly=yes \
-                -o PasswordAuthentication=no \
-                -o UserKnownHostsFile=/dev/null \
-                -o StrictHostKeyChecking=no \
+                -F "${ssh_configfile}" \
                 $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
-                vagrant@127.0.0.1
+                "${ssh_host}"
 
             if [[ $(( $SECONDS - $start_seconds )) -ge $connect_seconds_valid ]]; then
                 connected='y'
