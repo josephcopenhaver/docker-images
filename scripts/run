@@ -23,10 +23,16 @@
     done
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
+    . "$DIR/git.env"
+
+    BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+
     set -x
 
-    img="docker.io/josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-$version"
-    name="josephcopenhaver-$(basename "${img#*:}")$suffix"
+    BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+
+    img="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
+    name="josephcopenhaver-${img#*:}$suffix"
     prompt="Kill container: $name ? (y/n)"
     local_ssh_port=2222
 

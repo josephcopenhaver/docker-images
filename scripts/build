@@ -15,13 +15,20 @@
 
     set -x
 
+    version="${1:-latest}"
+
     cd "$DIR"
+
+    . git.env
 
     ./build-dockerfile
 
     cd ../src
 
-    DOCKER_IMAGE="josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+    BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+    BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+
+    DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
 
     HASH1=$(docker images -q "$DOCKER_IMAGE")
 

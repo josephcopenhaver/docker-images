@@ -3,7 +3,7 @@
 (
     set -exo pipefail
 
-    BRANCH=$(git symbolic-ref HEAD 2>/dev/null | cut -c12-)
+    BRANCH=$(git symbolic-ref --short HEAD)
     tag=''
 
     if [[ "$BRANCH" == "release/"* ]]; then
@@ -15,7 +15,7 @@
             echo "Invalid branch name, must not end in -latest"
             exit 1
         fi
-        tag="$(printf '%s' "$BRANCH" | cut -c9-)-latest"
+        tag="${BRANCH#*/}-latest"
         git tag -f "$tag"
     fi
 
