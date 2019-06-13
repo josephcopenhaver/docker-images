@@ -1,26 +1,22 @@
 #!/bin/bash
-{
-(
-    set -exo pipefail
+set -exo pipefail
 
-    BRANCH=$(git symbolic-ref --short HEAD)
-    tag=''
+BRANCH=$(git symbolic-ref --short HEAD)
+tag=''
 
-    if [[ "$BRANCH" == "release/"* ]]; then
-        if ! [[ "$BRANCH" =~ ^release\/[a-z0-9._-]+$ ]]; then
-            echo 'Invalid branch name, must match regex: /^release\/[a-z0-9._-]+$/'
-            exit 1
-        fi
-        if [[ "$BRANCH" == *"-latest" ]]; then
-            echo "Invalid branch name, must not end in -latest"
-            exit 1
-        fi
-        tag="${BRANCH#*/}-latest"
-        git tag -f "$tag"
+if [[ "$BRANCH" == "release/"* ]]; then
+    if ! [[ "$BRANCH" =~ ^release\/[a-z0-9._-]+$ ]]; then
+        echo 'Invalid branch name, must match regex: /^release\/[a-z0-9._-]+$/'
+        exit 1
     fi
+    if [[ "$BRANCH" == *"-latest" ]]; then
+        echo "Invalid branch name, must not end in -latest"
+        exit 1
+    fi
+    tag="${BRANCH#*/}-latest"
+    git tag -f "$tag"
+fi
 
-    git push
+git push
 
-    [ -z "$tag" ] || git push -f "$(git remote show)" "$tag"
-)
-} && exit $?
+[ -z "$tag" ] || git push -f "$(git remote show)" "$tag"

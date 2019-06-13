@@ -1,44 +1,42 @@
 #!/bin/bash
-{(
-    set -eo pipefail
+set -eo pipefail
 
-    CACHE_FROM="${CACHE_FROM:-}"
+CACHE_FROM="${CACHE_FROM:-}"
 
-    # Get absolute path to current script parent dir and save to DIR
-    SOURCE="${BASH_SOURCE[0]}"
-    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-        DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
-        SOURCE="$(readlink "$SOURCE")"
-        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-    done
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-    set -x
+set -x
 
-    version="${1:-latest}"
+version="${1:-latest}"
 
-    cd "$DIR"
+cd "$DIR"
 
-    . git.env
+. git.env
 
-    ./build-dockerfile
+./build-dockerfile
 
-    cd ../src
+cd ../src
 
-    BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
-    BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+BRANCH="${BRANCH:-$DETACHED_BRANCH}"
 
-    DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
+DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
 
-    HASH1=$(docker images -q "$DOCKER_IMAGE")
+HASH1=$(docker images -q "$DOCKER_IMAGE")
 
-    docker build \
-        $( test -z "$CACHE_FROM" || printf -- '--cache-from %s' "$CACHE_FROM" ) \
-        -t "$DOCKER_IMAGE" \
-        .
+docker build \
+    $( test -z "$CACHE_FROM" || printf -- '--cache-from %s' "$CACHE_FROM" ) \
+    -t "$DOCKER_IMAGE" \
+    .
 
-    [ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || (
-        docker rmi "$HASH1" || true
-        echo 'Unused images could still exist. You should run "docker image prune"'
-    )
-)} && exit $?
+[ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || (
+    docker rmi "$HASH1" || true
+    echo 'Unused images could still exist. You should run "docker image prune"'
+)
