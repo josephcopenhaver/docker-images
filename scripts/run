@@ -33,7 +33,7 @@
     bash "$DIR/init"
     . "$DIR/.env"
 
-    docker run --rm -d \
+    docker run --init --rm -d \
         -p 127.0.0.1:$local_ssh_port:22 \
         --name "$name" \
         --security-opt seccomp:unconfined \
