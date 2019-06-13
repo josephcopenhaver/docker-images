@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-use_remote_cache="$1"
+CACHE_FROM="${CACHE_FROM:-}"
 
 # Get absolute path to current script parent dir and save to DIR
 SOURCE="${BASH_SOURCE[0]}"
@@ -14,20 +14,25 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 set -x
 
+version="${1:-latest}"
+
 cd "$DIR"
+
+. git.env
 
 ./build-dockerfile
 
 cd ../src
 
-DOCKER_IMAGE="josephcopenhaver/docker-images:$(git symbolic-ref HEAD 2>/dev/null | cut -c20-)-latest"
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+BRANCH="${BRANCH:-$DETACHED_BRANCH}"
 
-test -z "$use_remote_cache" || docker pull "$DOCKER_IMAGE"
+DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
 
 HASH1=$(docker images -q "$DOCKER_IMAGE")
 
 docker build \
-    $( test -z "$use_remote_cache" || printf '--cache-from %s' "$DOCKER_IMAGE" ) \
+    $( test -z "$CACHE_FROM" || printf -- '--cache-from %s' "$CACHE_FROM" ) \
     -t "$DOCKER_IMAGE" \
     .
 
