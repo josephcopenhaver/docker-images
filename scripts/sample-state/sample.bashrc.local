@@ -9,5 +9,8 @@ alias predate="bash -c 'while IFS='' read -r line || [[ -n \"\$line\" ]]; do pri
 # allow xwindow programs to send data back over ssh connections
 export DISPLAY=127.0.0.1:0
 
+# alias exit so that the exit code is always zero
+alias exit='echo bye && \exit'
+
 # always keep this line last
 export PS1='`printf "%02X" $?`:\w `git branch 2> /dev/null | grep -E "^[*]" | sed -E "s/^\* +(.+?) *$/(\1) /"`\$ '

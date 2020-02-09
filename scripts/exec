@@ -1,0 +1,55 @@
+#!/bin/bash
+
+set -eo pipefail
+
+version="${1:-latest}"
+suffix="$2"
+[ -n "$suffix" ] && suffix="-$suffix"
+
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+. "$DIR/git.env"
+
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+
+set -x
+
+BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+
+img="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
+name="josephcopenhaver-${img#*:}$suffix"
+ssh_port="${SSH_PORT:-0}" # set to something other than zero if you need to have a static port
+
+. "$DIR/.env"
+
+set +x
+
+if [[ $ssh_port -eq 0 ]]; then
+    # find real local ssh port
+    ssh_port="$(docker inspect --format '{{(index (index .NetworkSettings.Ports "22/tcp") 0).HostPort}}' "$name")"
+    if [ -z "$ssh_port" ]; then
+        echo "Failed to get ssh port"
+        exit 1
+    fi
+fi
+
+ssh_host='127.0.0.1'
+ssh_configfile="$DIR/.state/.ssh_config"
+
+echo ""
+echo "SSH config file: ${ssh_configfile}"
+echo ""
+
+set +eo pipefail
+
+ssh \
+    -F "${ssh_configfile}" \
+    $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
+    "${ssh_host}"

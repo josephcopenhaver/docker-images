@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -eo pipefail
 
 # Get absolute path to current script parent dir and save to DIR

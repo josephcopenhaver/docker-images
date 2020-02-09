@@ -1,79 +1,82 @@
 #!/bin/bash
 
-{
+# if you modify this file, please consider also modifying exec
 
-# The extra curly braces and "} && exit $?" protect against editing of the script
-# affecting runtimes that have already started. Without this change there is a risk
-# of the script breaking after the user leaves the ssh session. This is bad, we need
-# to cleanup the container reliably and the script will change over time.
+set -eo pipefail
 
-(
-    set -eo pipefail
+version="${1:-latest}"
+suffix="$2"
+[ -n "$suffix" ] && suffix="-$suffix"
 
-    version="${1:-latest}"
-    suffix="$2"
-    [ -n "$suffix" ] && suffix="-$suffix"
-
-    # Get absolute path to current script parent dir and save to DIR
-    SOURCE="${BASH_SOURCE[0]}"
-    while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-        DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
-        SOURCE="$(readlink "$SOURCE")"
-        [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-    done
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
     DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-    . "$DIR/git.env"
+. "$DIR/git.env"
 
-    BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
 
+set -x
+
+BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+
+img="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
+name="josephcopenhaver-${img#*:}$suffix"
+ssh_port="${SSH_PORT:-0}" # set to something other than zero if you need to have a static port
+
+bash "$DIR/init"
+. "$DIR/.env"
+
+docker run --init --rm -d \
+    -p 127.0.0.1:$ssh_port:22 \
+    --name "$name" \
+    --security-opt seccomp:unconfined \
+    --cap-add sys_admin \
+    --privileged=true \
+    -v "$STATE_DIR/.bash_history:/home/vagrant/.bash_history" \
+    -v "$STATE_DIR/.bashrc.local:/home/vagrant/.bashrc.local" \
+    $(test ! -s "$DIR/.docker-options" || eval "printf '%s' \"$(cat "$DIR/.docker-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ')\"" ) \
+    "$img"
+
+set +x
+
+prompt="Kill container: $name ? (y/n)"
+
+if [[ $ssh_port -eq 0 ]]; then
+    # find real local ssh port
+    ssh_port="$(docker inspect --format '{{(index (index .NetworkSettings.Ports "22/tcp") 0).HostPort}}' "$name")"
+    if [ -z "$ssh_port" ]; then
+        echo "Failed to get ssh port"
+        exit 1
+    fi
+fi
+
+function control_c() {
     set -x
+    docker stop "$name"
+    exit 0
+}
 
-    BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+trap control_c SIGINT
+trap control_c SIGTERM
 
-    img="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
-    name="josephcopenhaver-${img#*:}$suffix"
-    prompt="Kill container: $name ? (y/n)"
-    local_ssh_port=2222
+remote_keyfile_dir='$HOME/.ssh.vagrant' # intentionally escaping $HOME variable
+ssh_host='127.0.0.1'
+ssh_keyfile="$DIR/.ssh_key"
+ssh_configfile="$DIR/.state/.ssh_config"
+connect_max_tries=10
+connect_attempt=0
 
-    bash "$DIR/init"
-    . "$DIR/.env"
-
-    docker run --init --rm -d \
-        -p 127.0.0.1:$local_ssh_port:22 \
-        --name "$name" \
-        --security-opt seccomp:unconfined \
-        --cap-add sys_admin \
-        --privileged=true \
-        -v "$STATE_DIR/.bash_history:/home/vagrant/.bash_history" \
-        -v "$STATE_DIR/.bashrc.local:/home/vagrant/.bashrc.local" \
-        $(test ! -s "$DIR/.docker-options" || eval "printf '%s' \"$(cat "$DIR/.docker-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ')\"" ) \
-        "$img"
-
-    set +x
-
-    function control_c() {
-        set -x
-        docker stop "$name"
-        exit 0
-    }
-
-    trap control_c SIGINT
-    trap control_c SIGTERM
-
-    remote_keyfile_dir='$HOME/.ssh.vagrant' # intentionally escaping $HOME variable
-    ssh_host='127.0.0.1'
-    ssh_keyfile="$DIR/.ssh_key"
-    ssh_configfile="$DIR/.state/.ssh_config"
-    connect_seconds_valid=5
-    connect_max_tries=10
-    connect_attempt=0
-    connected=''
-
-    cat << EOF | install -m 0600 /dev/stdin "${ssh_configfile}"
+install -m 0600 /dev/null "${ssh_configfile}"
+cat << EOF > "${ssh_configfile}"
 Host ${ssh_host}
   User vagrant
-  Port ${local_ssh_port}
+  Port ${ssh_port}
   UserKnownHostsFile /dev/null
   PasswordAuthentication no
   IdentitiesOnly yes
@@ -81,63 +84,54 @@ Host ${ssh_host}
   StrictHostKeyChecking no
 EOF
 
-    echo ""
-    echo "SSH config file: ${ssh_configfile}"
-    echo ""
+echo ""
+echo "SSH config file: ${ssh_configfile}"
+echo ""
 
-    set +eo pipefail
+set +eo pipefail
 
-    while :; do
-        while :; do
-            loop_start_seconds="$SECONDS"
-            connect_attempt=$(( $connect_attempt + 1 ))
-            if [[ $connect_attempt -gt $connect_max_tries ]]; then
-                connect_attempt=0
-                echo "Failed to connect after $connect_max_tries attempts, something is wrong"
-                break
-            fi
-            set -x
-            install -m 0600 /dev/null "$ssh_keyfile"
-            docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") && cat "'"$remote_keyfile_dir"'/id_rsa"' >> "$ssh_keyfile"
-            set +x
-            [ ! -s "$ssh_keyfile" ] \
-                && ( [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1 ) \
-                && continue
+while :; do
+    loop_start_seconds="$SECONDS"
+    connect_attempt=$(( $connect_attempt + 1 ))
+    if [[ $connect_attempt -gt $connect_max_tries ]]; then
+        echo "Failed to connect after $connect_max_tries attempts, something is wrong"
+        exit 1
+    fi
+    
+    install -m 0600 /dev/null "$ssh_keyfile"
+    docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") && cat "'"$remote_keyfile_dir"'/id_rsa"' >> "$ssh_keyfile"
+    
+    [ ! -s "$ssh_keyfile" ] \
+        && ( [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1 ) \
+        && continue
 
-            # You cannot use the exit code of ssh to determine if a connection was successful.
-            # By default ssh exits with the error code of the last command ran in the remote's
-            # shell. Going to time how long the ssh command took to return instead.
+    # You cannot use the exit code of ssh to determine if a connection was successful.
+    # By default ssh exits with the error code of the last command ran in the remote's
+    # shell. This is why I prefer this alias: exit='echo bye && \exit' in the remote shell
 
-            start_seconds="$SECONDS"
-            ssh \
-                -F "${ssh_configfile}" \
-                $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
-                "${ssh_host}"
+    ssh \
+        -F "${ssh_configfile}" \
+        $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
+        "${ssh_host}"
+    
+    if [[ $? -eq 0 ]]; then
+        break
+    fi
+    [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1
+done
 
-            if [[ $(( $SECONDS - $start_seconds )) -ge $connect_seconds_valid ]]; then
-                connected='y'
-                connect_attempt=0
-            fi
-            [ -n "$connected" ] && break
-            [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1
-        done
+# calling reset while within a visual studio code terminal window deletes output history
+# best to just avoid making a decision for the developer
+# reset
+echo "$prompt"
 
-        # calling reset while within a visual studio code terminal window deletes output history
-        # best to just avoid making a decision for the developer
-        # reset
-        echo "$prompt"
-
-        while read -r response; do
-            if [[ "$response" =~ ^(y|Y|n|N)$ ]]; then
-                if [[ "$response" =~ ^(y|Y)$ ]]; then
-                    control_c
-                else
-                    break
-                fi
-            fi
-            echo "$prompt"
-        done
-    done
-)
-
-} && exit $?
+while read -r response; do
+    if [[ "$response" =~ ^(y|Y|n|N)$ ]]; then
+        if [[ "$response" =~ ^(y|Y)$ ]]; then
+            control_c
+        else
+            break
+        fi
+    fi
+    echo "$prompt"
+done
