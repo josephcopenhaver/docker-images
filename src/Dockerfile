@@ -119,6 +119,11 @@ RUN /tmp/22_install_nginx \
  && rm /tmp/22_install_nginx \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/23_install_nim /tmp/23_install_nim
+RUN /tmp/23_install_nim \
+ && rm /tmp/23_install_nim \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/97_install_kubernetes_tools /tmp/97_install_kubernetes_tools
 RUN /tmp/97_install_kubernetes_tools \
  && rm /tmp/97_install_kubernetes_tools \

@@ -1,0 +1,26 @@
+#!/bin/bash
+echo install nim
+(
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+
+        set -eo pipefail ; . /etc/provision_functions ; set -x
+
+        export CHOOSENIM_CHOOSE_VERSION="1.0.6"
+
+        curl -fsSL https://nim-lang.org/choosenim/init.sh -o /tmp/choosenim-init.sh
+        chmod a+x /tmp/choosenim-init.sh
+        sudo -E /tmp/choosenim-init.sh -y
+        rm -f /tmp/choosenim-init.sh
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export NIMBLE_HOME="$HOME/.nimble"
+export PATH="$NIMBLE_HOME/bin:$PATH"
+BASHRC_EOF
+
+        sudo chown -R vagrant:vagrant "$HOME/.choosenim"
+        sudo chown -R vagrant:vagrant "$NIMBLE_HOME"
+
+EOF
+)
