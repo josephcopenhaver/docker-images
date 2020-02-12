@@ -13,7 +13,12 @@ BASHRC_EOF
 
         mkdir -p "$CIRCLECI_HOME/bin"
 
-        curl -fsSL https://circle.ci/cli | DESTDIR="$CIRCLECI_HOME/bin" bash
+        # upstream http2 redirect broke 2019-02-12
+        # curl -fsSL https://circle.ci/cli | DESTDIR="$CIRCLECI_HOME/bin" bash
+        # error:
+        # curl: (16) Error in the HTTP2 framing layer
+
+        curl -fsSL https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh | DESTDIR="$CIRCLECI_HOME/bin" bash
 
 EOF
 )
