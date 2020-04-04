@@ -13,4 +13,4 @@ export DISPLAY=127.0.0.1:0
 alias exit='echo bye && \exit'
 
 # always keep this line last
-export PS1='`printf "%02X" $?`:\w `git branch 2> /dev/null | grep -E "^[*]" | sed -E "s/^\* +(.+?) *$/(\1) /"`\$ '
+export PS1='`printf "%02X" $?`:\w `git rev-parse --abbrev-ref HEAD 2> /dev/null | sed -E "s/^(.+) *$/(\1) /"`\$ '
