@@ -22,7 +22,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 BASHRC_EOF
 
-        pyenv install --skip-existing 3.6.1
+        pyenv install --skip-existing 3.9.4
 
 EOF
 )

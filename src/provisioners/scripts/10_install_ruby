@@ -13,7 +13,7 @@ echo install ruby
             echo 'workaround: "gpg: keyserver receive failed: Cannot assign requested address"'
             # Ref: https://github.com/inversepath/usbarmory-debian-base_image/issues/9
 
-            mkdir -p ~/.gnupg
+            mkdir -m700 -p ~/.gnupg
             echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
         )
 

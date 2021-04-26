@@ -9,7 +9,7 @@ echo install java version manager
     # Ref: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
     mkdir -p /usr/share/man/man1
 
-    major_version='8'
+    major_version='11'
     apt-get install -y \
         man \
         "openjdk-$major_version-jre-headless" \
@@ -25,7 +25,7 @@ echo install java version manager
         cd "$JENV_DIR"
         git fetch origin
 
-        latest_jenv_version=0.4.4
+        latest_jenv_release=0.5.4
         # latest_jenv_release="$(cd "$JENV_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "[0-9]*" $(git rev-list --tags --max-count=1))"
 
         git checkout -f "$latest_jenv_release"

@@ -5,16 +5,20 @@ echo install base python runtime
 
     apt-get update
 
-    apt-get install -y python-setuptools
+    apt-get install -y python3-setuptools
 
-    command -v pip || easy_install pip
+    command -v pip3 || apt-get install -y python3-pip
+
+    ln -s "$(command -v pip3)" "$(dirname "$(command -v pip3)")/pip"
 
     pip install -U \
         pip \
         pipenv
 
     apt-get install -y \
-        python-dev \
+        libsqlite3-dev \
+        \
+        python3-dev \
         zlib1g-dev \
         zlib1g \
         gzip \
@@ -26,7 +30,7 @@ echo install base python runtime
         \
         openssl \
         libssl-dev \
-        python-openssl \
+        python3-openssl \
         \
         build-essential
 )

@@ -99,7 +99,7 @@ while :; do
     fi
     
     install -m 0600 /dev/null "$ssh_keyfile"
-    docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") && cat "'"$remote_keyfile_dir"'/id_rsa"' >> "$ssh_keyfile"
+    docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") >/dev/null 2>/dev/null && cat "'"$remote_keyfile_dir"'/id_rsa" | base64 -w0' | base64 -d >> "$ssh_keyfile"
     
     [ ! -s "$ssh_keyfile" ] \
         && ( [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1 ) \
