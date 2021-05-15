@@ -25,7 +25,13 @@ cd "$DIR"
 
 cd ../src
 
-BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null)"
+# if in a CI environment, verify regenerating files resulted in no differences
+if [ "${CI}" == "true" ] && [ -n "$(git status --porcelain)" ]; then
+    echo "cowardly refusing to build: looks like the dockerfile needs to be regenerated and results need to be commited"
+    exit 1
+fi
+
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
 BRANCH="${BRANCH:-$DETACHED_BRANCH}"
 
 DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"

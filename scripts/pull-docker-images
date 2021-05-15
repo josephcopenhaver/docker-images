@@ -1,0 +1,42 @@
+#!/bin/bash
+
+set -eo pipefail
+
+# Get absolute path to current script parent dir and save to DIR
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+set -x
+
+cd "$DIR"
+
+. git.env
+
+cd ../src
+
+BRANCH="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
+BRANCH="${BRANCH:-$DETACHED_BRANCH}"
+
+DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-latest"
+
+set +x
+
+pids=()
+i=0
+while IFS= read -r src_image; do
+    i=$(( $i + 1 ))
+    echo "pulling docker image: ${src_image}"
+    docker pull "${src_image}" &
+    pids[${i}]=$!
+done < <(echo "${DOCKER_IMAGE}" && cat Dockerfile | grep -E '^FROM\s+' | sed -r 's/[^\s]+\s+([a-zA-Z0-9:\/\.\-_]+).*/\1/')
+
+for pid in ${pids[*]}; do
+    wait $pid
+done
+
+set -x

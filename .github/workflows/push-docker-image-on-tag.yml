@@ -1,0 +1,25 @@
+name: Publish Docker image on tag
+on:
+  push:
+    tags:
+      - dev-environment-latest
+
+jobs:
+  build_and_push:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: pull last published docker image to populate docker cache
+        run: ./scripts/pull-docker-images
+      - name: build image
+        run: CACHE_FROM=josephcopenhaver/docker-images:dev-environment-latest ./scripts/build
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASS }}
+      - name: push docker image
+        run: |
+          ./scripts/push-docker-images "${GITHUB_SHA}"

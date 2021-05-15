@@ -2,7 +2,7 @@
 
 set -exo pipefail
 
-BRANCH=$(git symbolic-ref --short HEAD)
+BRANCH="$(git symbolic-ref --short HEAD)"
 tag=''
 
 if [[ "$BRANCH" == "release/"* ]]; then

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -exo pipefail
+
+GITHUB_SHA="$1"
+
+if [ -z "${GITHUB_SHA}" ]; then
+    echo "No github sha specified"
+    exit 1
+fi
+
+docker tag josephcopenhaver/docker-images:dev-environment-latest "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
+docker push "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
+docker push josephcopenhaver/docker-images:dev-environment-latest
