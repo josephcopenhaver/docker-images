@@ -1,0 +1,17 @@
+name: Weekly Release Branch Check
+on:
+  schedule:
+    # Every Friday at 17:30 CST with a random 1-60 minute offset (23)
+    - cron: "53 22 * * 5"
+
+jobs:
+  build_dev_environment:
+    name: Verify dev environment image builds without a cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+        with:
+          ref: release/dev-environment
+      - name: build image
+        run: ./scripts/build
