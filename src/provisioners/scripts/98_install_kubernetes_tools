@@ -12,7 +12,7 @@ BASHRC_EOF
 
         mkdir -p "$KUBE_ENV_HOME/bin"
 
-        version="v1.13.3"
+        version="v1.20.4"
         # version="$(curl -fsSL https://storage.googleapis.com/kubernetes-release/release/stable.txt)" # latest stable version
 
         mkdir -p "$KUBE_ENV_HOME/versions/$version"
