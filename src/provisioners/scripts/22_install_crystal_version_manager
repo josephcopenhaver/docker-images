@@ -36,7 +36,7 @@ export PATH="$CRENV_HOME/bin:$PATH"
 eval "$(crenv init -)"
 BASHRC_EOF
 
-        version="1.0.0"
+        version="1.1.1"
         # version="$(crenv install -l | sort --version-sort | tail -1 | sed -E 's/^\s+//; s/\s+$//;')"
 
         crenv install "$version"

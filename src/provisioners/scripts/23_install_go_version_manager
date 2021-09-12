@@ -18,7 +18,7 @@ echo install go version manager
 . "$HOME/.gvm/scripts/gvm"
 BASHRC_EOF
 
-        latest_binary_release="go1.16"
+        latest_binary_release="go1.17"
 
         # major_version=1
         # latest_binary_release="go$(set -eo pipefail ; gvm listall | grep -E '^\s*go'"$major_version"'\.[0-9]+(\.[0-9]+)?\s*$' | sed -E 's/^\s*go([^\s]+)\s*/\1/' | sort --version-sort | tail -1)"
@@ -27,7 +27,7 @@ BASHRC_EOF
         gvm install "$latest_binary_release" -B
         gvm use "$latest_binary_release" --default
 
-        latest_release="go1.16"
+        latest_release="go1.17"
 
         if [ "$latest_binary_release" != "$latest_release" ]; then
             printf 'latest_release=%q\n' "$latest_release"

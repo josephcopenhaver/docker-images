@@ -1,8 +1,8 @@
-FROM debian:10.8-slim
+FROM debian:11.0-slim
 
 LABEL maintainer="joseph.copenhaver@gmail.com"
 
-RUN echo 'First apt-get upgrade ran on `date +%s`=1613956347' \
+RUN echo 'First apt-get upgrade ran on `date +%s`=1631417492' \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update \
  && apt-get install bash \

@@ -7,7 +7,7 @@ echo install nim
 
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        export CHOOSENIM_CHOOSE_VERSION="1.4.4"
+        export CHOOSENIM_CHOOSE_VERSION="1.4.8"
 
         curl -fsSL https://nim-lang.org/choosenim/init.sh -o /tmp/choosenim-init.sh
         chmod a+x /tmp/choosenim-init.sh

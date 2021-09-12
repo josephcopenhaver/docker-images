@@ -6,7 +6,7 @@ echo install cfn-lint from https://github.com/awslabs/cfn-python-lint
     apt-get install -y \
         libyaml-dev
 
-    version='==0.45.0'
+    version='==0.54.1'
     # version=''
 
     pip install "cfn-lint${version}"
