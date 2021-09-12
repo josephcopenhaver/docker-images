@@ -124,6 +124,11 @@ RUN /tmp/23_install_go_version_manager \
  && rm /tmp/23_install_go_version_manager \
  && rm -rf /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/24_install_mage /tmp/24_install_mage
+RUN /tmp/24_install_mage \
+ && rm /tmp/24_install_mage \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_kubernetes_tools /tmp/98_install_kubernetes_tools
 RUN /tmp/98_install_kubernetes_tools \
  && rm /tmp/98_install_kubernetes_tools \
