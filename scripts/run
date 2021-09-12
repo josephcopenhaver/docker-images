@@ -72,6 +72,21 @@ ssh_configfile="$DIR/.state/.ssh_config"
 connect_max_tries=10
 connect_attempt=0
 
+# Note on wsl a mounted filesystem has filed permissions set permanently to *777
+#
+# if on wsl then change keyfile dir under the user's home directory
+install -m 0600 /dev/null "$ssh_keyfile"
+if [[ "$(stat -c '%a' "$ssh_keyfile")" != *"600" ]]; then
+    keyfileCacheDir="$HOME/.josephcopenhaver/.docker-images"
+    mkdir -p "$keyfileCacheDir"
+    ssh_keyfile="$keyfileCacheDir/$(printf '%s' "$ssh_keyfile" | base64 -w0 | sed -r 's/\+/-/g; s/\//_/g; s/=+$//').pem"
+    install -m 0600 /dev/null "$ssh_keyfile"
+    if [[ "$(stat -c '%a' "$ssh_keyfile")" != *"600" ]]; then
+        echo "failed to find a keyfile dir that would let permissions be set to 0600 properly: $ssh_keyfile"
+        exit 1
+    fi
+fi
+
 install -m 0600 /dev/null "${ssh_configfile}"
 cat << EOF > "${ssh_configfile}"
 Host ${ssh_host}
@@ -88,8 +103,6 @@ echo ""
 echo "SSH config file: ${ssh_configfile}"
 echo ""
 
-set +eo pipefail
-
 while :; do
     loop_start_seconds="$SECONDS"
     connect_attempt=$(( $connect_attempt + 1 ))
@@ -98,8 +111,12 @@ while :; do
         exit 1
     fi
     
+    # ensure target ssh keyfile is empty as this will be used to indicate a successful fetch or not
     install -m 0600 /dev/null "$ssh_keyfile"
+
+    set +eo pipefail
     docker exec -it -u vagrant:vagrant "$name" bash -c '(test -f "'"$remote_keyfile_dir"'/id_rsa" || ssh-keygen -t rsa -b 4096 -f "'"$remote_keyfile_dir"'/id_rsa" -q -N "" && install -m 0600 "'"$remote_keyfile_dir"'/id_rsa.pub" "'"$remote_keyfile_dir"'/authorized_keys") >/dev/null 2>/dev/null && cat "'"$remote_keyfile_dir"'/id_rsa" | base64 -w0' | base64 -d >> "$ssh_keyfile"
+    set -eo pipefail
     
     [ ! -s "$ssh_keyfile" ] \
         && ( [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1 ) \
@@ -109,12 +126,15 @@ while :; do
     # By default ssh exits with the error code of the last command ran in the remote's
     # shell. This is why I prefer this alias: exit='echo bye && \exit' in the remote shell
 
+    set +eo pipefail
     ssh \
         -F "${ssh_configfile}" \
         $(test ! -s "$DIR/.ssh-options" || (cat "$DIR/.ssh-options" | sed -E 's/^\s*#.*$//' | tr '\n' ' ') ) \
         "${ssh_host}"
+    rc=$?
+    set -eo pipefail
     
-    if [[ $? -eq 0 ]]; then
+    if [[ $rc -eq 0 ]]; then
         break
     fi
     [[ $(( $SECONDS - $loop_start_seconds )) -ge 1 ]] || sleep 1
