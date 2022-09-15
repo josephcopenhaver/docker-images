@@ -1,26 +1,36 @@
 #!/bin/bash
 echo install nim
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
-    sudo -u vagrant bash <<'EOF'
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        echo "warning: skipping nim install because choosenim does not support aarch64 platform as of 2022-09-15"
+    else
 
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        sudo -u vagrant bash <<'EOF'
+        main() {
+            set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        export CHOOSENIM_CHOOSE_VERSION="1.4.8"
+            export CHOOSENIM_CHOOSE_VERSION="1.6.6"
 
-        curl -fsSL https://nim-lang.org/choosenim/init.sh -o /tmp/choosenim-init.sh
-        chmod a+x /tmp/choosenim-init.sh
-        sudo -E /tmp/choosenim-init.sh -y
-        rm -f /tmp/choosenim-init.sh
+            curl -fsSL https://nim-lang.org/choosenim/init.sh -o /tmp/choosenim-init.sh
+            chmod a+x /tmp/choosenim-init.sh
+            sudo -E /tmp/choosenim-init.sh -y
+            rm -f /tmp/choosenim-init.sh
 
-        bashrc_add_noninteractive <<'BASHRC_EOF'
+            bashrc_add_noninteractive <<'BASHRC_EOF'
 export NIMBLE_HOME="$HOME/.nimble"
 export PATH="$NIMBLE_HOME/bin:$PATH"
 BASHRC_EOF
 
-        sudo chown -R vagrant:vagrant "$HOME/.choosenim"
-        sudo chown -R vagrant:vagrant "$NIMBLE_HOME"
-
+            sudo chown -R vagrant:vagrant "$HOME/.choosenim"
+            sudo chown -R vagrant:vagrant "$NIMBLE_HOME"
+        }
+        main
 EOF
+
+    fi
+}
+main
 )

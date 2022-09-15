@@ -1,13 +1,16 @@
 #!/bin/bash
 echo install cfn-lint from https://github.com/awslabs/cfn-python-lint
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get install -y \
         libyaml-dev
 
-    version='==0.54.1'
+    local version='==0.65.0'
     # version=''
 
     pip install "cfn-lint${version}"
+}
+main
 )

@@ -1,4 +1,4 @@
-FROM debian:11.0-slim
+FROM debian:11.5-slim
 
 LABEL maintainer="joseph.copenhaver@gmail.com"
 
@@ -138,7 +138,5 @@ COPY ./provisioners/scripts/99_install_docker /tmp/99_install_docker
 RUN /tmp/99_install_docker \
  && rm /tmp/99_install_docker \
  && rm -rf /var/lib/apt/lists/*
-
-STOPSIGNAL SIGRTMIN+3
 
 ENTRYPOINT [ "/init" ]

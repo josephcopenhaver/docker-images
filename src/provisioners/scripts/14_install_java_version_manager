@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install java version manager
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
@@ -9,13 +10,14 @@ echo install java version manager
     # Ref: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
     mkdir -p /usr/share/man/man1
 
-    major_version='11'
+    local major_version='11' # TODO: find out how to update to v12
     apt-get install -y \
-        man \
+        man-db \
         "openjdk-$major_version-jre-headless" \
         "openjdk-$major_version-jdk"
 
     sudo -u vagrant bash <<'EOF'
+    main() {
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
         export JENV_DIR="$HOME/.jenv"
@@ -25,7 +27,7 @@ echo install java version manager
         cd "$JENV_DIR"
         git fetch origin
 
-        latest_jenv_release=0.5.4
+        local latest_jenv_release=0.5.5
         # latest_jenv_release="$(cd "$JENV_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "[0-9]*" $(git rev-list --tags --max-count=1))"
 
         git checkout -f "$latest_jenv_release"
@@ -41,6 +43,11 @@ BASHRC_EOF
         set +x
 
         jenv rehash
+    }
+    main
 
 EOF
+
+}
+main
 )

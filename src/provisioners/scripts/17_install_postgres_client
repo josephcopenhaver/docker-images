@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install mysql client
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
@@ -10,4 +11,6 @@ echo install mysql client
 
     apt-get install -y \
         postgresql-client
+}
+main
 )

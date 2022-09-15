@@ -1,10 +1,11 @@
 #!/bin/bash
 echo install node version manager
 (
+main() {
     set -exo pipefail
 
     sudo -u vagrant bash <<'EOF'
-
+    main() {
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
 
@@ -16,7 +17,7 @@ BASHRC_EOF
         git clone https://github.com/creationix/nvm.git "$NVM_DIR"
         cd "$NVM_DIR"
         git fetch origin
-        latest_nvm_release="v0.34.0"
+        local latest_nvm_release="v0.39.1"
         # latest_nvm_release="$(cd "$NVM_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))"
         git checkout -f "$latest_nvm_release"
 
@@ -32,15 +33,20 @@ BASHRC_EOF
         # disabling it so people can remain sane
         set +x
 
-        latest_node_release="v14.17.6"
+        local latest_node_release="v16.17.0"
         # latest_node_release="$(nvm ls-remote --lts | grep Latest | sed -E 's/^\s*(v[0-9.]+)\s+.*$/\1/' | sort --version-sort | tail -1)"
         nvm install "$latest_node_release"
         nvm alias default "$latest_node_release"
 
         npm --version
-        latest_npm_version=v7.23.0
+        local latest_npm_version=v8.19.2
         # latest_npm_version=latest
         npm install -g "npm@$latest_npm_version"
+    }
+    main
 
 EOF
+
+}
+main
 )

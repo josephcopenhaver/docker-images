@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install crystal version manager
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     echo install crystal dependencies
@@ -24,23 +25,32 @@ echo install crystal version manager
 
     apt autoremove
 
-    sudo -u vagrant bash <<'EOF'
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        echo "warning: skipping nim install because choosenim does not support aarch64 platform as of 2022-09-15"
+    else
 
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        sudo -u vagrant bash <<'EOF'
+        main() {
+            set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        curl -fsSL https://raw.github.com/pine/crenv/master/install.sh | bash
+            curl -fsSL https://raw.github.com/pine/crenv/master/install.sh | bash
 
-        bashrc_add_noninteractive <<'BASHRC_EOF'
+            bashrc_add_noninteractive <<'BASHRC_EOF'
 export CRENV_HOME="$HOME/.crenv"
 export PATH="$CRENV_HOME/bin:$PATH"
 eval "$(crenv init -)"
 BASHRC_EOF
 
-        version="1.1.1"
-        # version="$(crenv install -l | sort --version-sort | tail -1 | sed -E 's/^\s+//; s/\s+$//;')"
+            local version="1.5.1"
+            # version="$(crenv install -l | sort --version-sort | tail -1 | sed -E 's/^\s+//; s/\s+$//;')"
 
-        crenv install "$version"
-        crenv global "$version"
-
+            crenv install "$version"
+            crenv global "$version"
+        }
+        main
 EOF
+
+    fi
+}
+main
 )

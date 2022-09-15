@@ -1,6 +1,7 @@
 #!/bin/bash
 echo Install provision bash functions
 (
+main() {
     set -exo pipefail
 
     cat <<'EOF' | install -m 0666 /dev/stdin /etc/provision_functions
@@ -68,4 +69,6 @@ bashrc_add_interactive() {
 }
 EOF
 
+}
+main
 )

@@ -1,12 +1,13 @@
 #!/bin/bash
 echo install ruby
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get install -y gnupg2 dirmngr
 
     sudo -u vagrant bash <<'EOF'
-
+    main() {
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
         (
@@ -30,6 +31,11 @@ echo install ruby
 export RVM_HOME="$HOME/.rvm"
 . $RVM_HOME/scripts/rvm
 BASHRC_EOF
+    }
+    main
 
 EOF
+
+}
+main
 )

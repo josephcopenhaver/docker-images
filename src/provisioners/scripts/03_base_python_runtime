@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install base python runtime
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
@@ -15,6 +16,10 @@ echo install base python runtime
 
     apt-get install -y \
         libsqlite3-dev \
+        \
+        libffi7 \
+        libffi-dev \
+        liblzma-dev \
         \
         python3-dev \
         zlib1g-dev \
@@ -31,4 +36,6 @@ echo install base python runtime
         python3-openssl \
         \
         build-essential
+}
+main
 )

@@ -1,13 +1,16 @@
 #!/bin/bash
 echo install yamllint from https://github.com/adrienverge/yamllint
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get install -y \
         libyaml-dev
 
-    version='==1.26.3'
+    local version='==1.28.0'
     # version=''
 
     pip install "yamllint${version}"
+}
+main
 )

@@ -1,16 +1,22 @@
 #!/bin/bash
 echo install jsonlint from nodejs packages
 (
+main() {
     set -exo pipefail
 
     sudo -u vagrant bash <<'EOF'
-
+    main() {
         set -eo pipefail ; . ~/.bashrc ; set -x
 
-        version='v1.6.3'
+        local version='v1.6.3'
         # version='latest'
 
         npm install -g "jsonlint@${version}"
+    }
+    main
 
 EOF
+
+}
+main
 )

@@ -1,9 +1,11 @@
 #!/bin/bash
 echo install adr tools
 (
+main() {
 
     # install bash completion for docker-compose
     sudo -u vagrant bash <<'EOF'
+    main() {
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
@@ -12,7 +14,7 @@ BASHRC_EOF
 
         mkdir -p "$ADR_TOOLS_HOME/versions"
 
-        version="3.0.0"
+        local version="3.0.0"
 
         curl -fsSL https://github.com/npryce/adr-tools/archive/$version.tar.gz | tar zxf - -C "$ADR_TOOLS_HOME/versions/" --transform 's/^adr-tools-//'
 
@@ -21,6 +23,11 @@ BASHRC_EOF
         bashrc_add_noninteractive <<'BASHRC_EOF'
 export PATH="$PATH:$ADR_TOOLS_HOME/bin"
 BASHRC_EOF
+    }
+    main
 
 EOF
+
+}
+main
 )

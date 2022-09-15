@@ -32,7 +32,7 @@ ssh_port="${SSH_PORT:-0}" # set to something other than zero if you need to have
 bash "$DIR/init"
 . "$DIR/.env"
 
-docker run --init --rm -d \
+docker run --rm -d \
     -p 127.0.0.1:$ssh_port:22 \
     --name "$name" \
     --security-opt seccomp:unconfined \

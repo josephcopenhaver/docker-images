@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install rcode as an alias for rmate
 (
+main() {
     set -exo pipefail
 
     curl -fsSL https://raw.github.com/aurora/rmate/master/rmate | install -m 755 /dev/stdin /tmp/rmate.dl.tmp
@@ -14,4 +15,6 @@ echo install rcode as an alias for rmate
     # install the binary
     mv /tmp/rmate.dl.tmp /usr/local/bin/rmate
     ln -s rmate /usr/local/bin/rcode
+}
+main
 )

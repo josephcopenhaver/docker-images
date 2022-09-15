@@ -1,45 +1,61 @@
 #!/bin/bash
 echo install docker
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
-    # version='=5:18.09.1~3-0~debian-stretch'
-    # set version to an empty string if this hardcoded version is no longer available for install
-    version=''
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        echo "warning: skipping docker install because docker does not support aarch64 platform as of 2022-09-15"
+    else
 
-    curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+        local version='=5:18.09.1~3-0~debian-stretch'
+        # set version to an empty string if this hardcoded version is no longer available for install
+        version=''
 
-    printf 'deb [arch=amd64] https://download.docker.com/linux/debian %s stable' "$(lsb_release -cs)" > /etc/apt/sources.list.d/docker.list
+        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 
-    apt-get update
+        local arch='amd64'
+        if [[ "$(uname -m)" == "aarch64" ]]; then
+            arch='arm64'
+        fi
 
-    apt-get install -y "docker-ce$version"
+        printf 'deb [arch=%s] https://download.docker.com/linux/debian %s stable' "${arch}" "$(lsb_release -cs)" > /etc/apt/sources.list.d/docker.list
 
-    pip install docker-compose
+        apt-get update
 
-    # verify installation of docker-compose works
-    docker-compose version
+        apt-get install -y "docker-ce$version"
 
-    usermod -a -G docker vagrant
+        pip install docker-compose
 
-    # install bash completion for docker-compose
-    sudo -u vagrant bash <<'EOF'
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        # verify installation of docker-compose works
+        docker-compose version
 
-        version="$(docker-compose --version | sed -E 's/^.* version ([0-9.]+).*$/\1/')"
-        file="$HOME/.bash_completions.d/docker-compose-$version"
+        usermod -a -G docker vagrant
 
-        curl -fsSL https://raw.githubusercontent.com/docker/compose/$version/contrib/completion/bash/docker-compose -o "$file"
+        # install bash completion for docker-compose
+        sudo -u vagrant bash <<'EOF'
+        main() {
+            set -eo pipefail ; . /etc/provision_functions ; set -x
 
-        bashrc_add_interactive <<BASHRC_EOF
+            local version="$(docker-compose --version | sed -E 's/^.* version ([0-9.]+).*$/\1/')"
+            local file="$HOME/.bash_completions.d/docker-compose-$version"
+
+            curl -fsSL https://raw.githubusercontent.com/docker/compose/$version/contrib/completion/bash/docker-compose -o "$file"
+
+            bashrc_add_interactive <<BASHRC_EOF
 [ ! -s "$file" ] || . "$file"
 BASHRC_EOF
+        }
+        main
 
 EOF
 
-    mkdir -p /etc/services.d/dockerd
-    cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/dockerd/run
+        mkdir -p /etc/services.d/dockerd
+        cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/dockerd/run
 #!/usr/bin/execlineb -P
 /usr/bin/dockerd
 EOF
+    fi
+}
+main
 )

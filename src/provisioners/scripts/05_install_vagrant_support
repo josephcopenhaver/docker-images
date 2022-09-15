@@ -1,6 +1,7 @@
 #!/bin/bash
 echo install vagrant ssh support
 (
+main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
     apt-get update
@@ -32,4 +33,7 @@ set -exo pipefail
 mkdir -p /var/run/sshd
 exec /usr/sbin/sshd -D
 EOF
+
+}
+main
 )

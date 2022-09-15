@@ -1,10 +1,11 @@
 #!/bin/bash
 echo install rust
 (
+main() {
     set -exo pipefail
 
     sudo -u vagrant bash <<'EOF'
-
+    main() {
         set -eo pipefail ; . /etc/provision_functions ; set -x
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
@@ -20,6 +21,11 @@ BASHRC_EOF
         bashrc_add_interactive <<'BASHRC_EOF'
 eval "$(rustup completions bash)"
 BASHRC_EOF
+    }
+    main
 
 EOF
+
+}
+main
 )
