@@ -14,4 +14,4 @@ jobs:
         with:
           ref: release/dev-environment
       - name: build image
-        run: ./scripts/build
+        run: DOCKER_DEFAULT_PLATFORM=linux/amd64 ./scripts/build
