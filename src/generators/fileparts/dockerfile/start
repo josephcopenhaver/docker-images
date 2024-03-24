@@ -2,7 +2,7 @@ FROM debian:11.5-slim
 
 LABEL maintainer="joseph.copenhaver@gmail.com"
 
-RUN echo 'First apt-get upgrade ran on `date +%s`=1631417492' \
+RUN echo 'First apt-get upgrade ran on `date +%s`=1711298763' \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update \
  && apt-get install bash \

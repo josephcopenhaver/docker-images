@@ -1,0 +1,40 @@
+#!/bin/bash
+echo install go version manager
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . /etc/provision_functions ; set -x
+
+        # moved away from gvm until https://github.com/moovweb/gvm/pull/470 and related issues are resolved.
+
+        # https://go.dev/doc/install
+
+        local version="1.22.1"
+
+        local os="linux"
+        local arch="$(x="$(uname -m)" && if [[ "$x" == "aarch64" ]] || [[ "$x" == "arm64" ]] || [[ "$x" == "arm64v8" ]]; then printf 'arm64' ; else printf 'amd64' ; fi)"
+        local url="https://go.dev/dl/go${version}.${os}-${arch}.tar.gz"
+        printf '%s' "$url" > /tmp/go.url.txt
+        curl -fsSL "$url" -o /tmp/go.tar.gz
+        mkdir -p $HOME/.local/bin
+        rm -rf $HOME/.local/go && tar -C $HOME/.local/ -xzf /tmp/go.tar.gz
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export GOBIN="$HOME/.local/go/bin"
+export PATH="$PATH:$GOBIN"
+BASHRC_EOF
+
+        go version
+        rm /tmp/go.tar.gz
+        rm /tmp/go.url.txt
+    }
+    main
+
+EOF
+
+}
+main
+)

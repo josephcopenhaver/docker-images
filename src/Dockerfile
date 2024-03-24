@@ -2,7 +2,7 @@ FROM debian:11.5-slim
 
 LABEL maintainer="joseph.copenhaver@gmail.com"
 
-RUN echo 'First apt-get upgrade ran on `date +%s`=1631417492' \
+RUN echo 'First apt-get upgrade ran on `date +%s`=1711298763' \
  && export DEBIAN_FRONTEND=noninteractive \
  && apt-get update \
  && apt-get install bash \
@@ -119,9 +119,9 @@ RUN /tmp/22_install_crystal_version_manager \
  && rm /tmp/22_install_crystal_version_manager \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./provisioners/scripts/23_install_go_version_manager /tmp/23_install_go_version_manager
-RUN /tmp/23_install_go_version_manager \
- && rm /tmp/23_install_go_version_manager \
+COPY ./provisioners/scripts/23_install_golang /tmp/23_install_golang
+RUN /tmp/23_install_golang \
+ && rm /tmp/23_install_golang \
  && rm -rf /var/lib/apt/lists/*
 
 COPY ./provisioners/scripts/24_install_mage /tmp/24_install_mage
