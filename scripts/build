@@ -38,7 +38,9 @@ DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
 
 HASH1=$(docker images -q "$DOCKER_IMAGE")
 
-docker build \
+export DOCKER_BUILD_PLATFORM="${DOCKER_BUILD_PLATFORM:-${DOCKER_PLATFORM:-${DOCKER_DEFAULT_PLATFORM:-linux/$(uname -m)}}}"
+
+docker buildx build "--platform=$DOCKER_BUILD_PLATFORM" \
     $( test -z "$CACHE_FROM" || printf -- '--cache-from %s' "$CACHE_FROM" ) \
     -t "$DOCKER_IMAGE" \
     .

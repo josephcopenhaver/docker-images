@@ -1,0 +1,29 @@
+#!/bin/bash
+echo install rust
+(
+main() {
+    set -exo pipefail
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.77.0"
+
+        asdf plugin add rust
+        asdf install rust "$version"
+        asdf global rust "$version"
+
+        bashrc_add_interactive <<'BASHRC_EOF'
+eval "$(rustup completions bash)"
+BASHRC_EOF
+
+        rustc --version
+    }
+    main
+
+EOF
+
+}
+main
+)

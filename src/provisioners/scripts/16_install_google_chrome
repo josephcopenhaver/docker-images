@@ -5,7 +5,7 @@ main() {
     # inspired from https://github.com/jessfraz/dockerfiles/blob/master/chrome/stable/Dockerfile
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
-    local chrome_version="=71.0.3578.98-1"
+    local chrome_version="=123.0.6312.58-1"
     # looks like remote versions rotate out pretty often, just going to install some version of stable...
     # this is done by setting the version to an empty string
     chrome_version=""
@@ -28,6 +28,8 @@ main() {
         # going to raise an error unless the platform is aarch64
         if [[ "$(uname -m)" == "aarch64" ]]; then
             # let continue
+            rm /etc/apt/sources.list.d/google-chrome.list
+            apt-get update
             echo "warning: skipping google-chrome-stable package installation: architecture was aarch64 and as of 2022-09-15 is not present on the remote repository"
         else
             echo "failed to install google-chrome-stable package"

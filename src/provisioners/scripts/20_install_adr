@@ -6,7 +6,7 @@ main() {
     # install bash completion for docker-compose
     sudo -u vagrant bash <<'EOF'
     main() {
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
 export ADR_TOOLS_HOME="$HOME/.adr-tools"

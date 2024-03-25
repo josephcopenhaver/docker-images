@@ -6,7 +6,7 @@ main() {
 
     sudo -u vagrant bash <<'EOF'
     main() {
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
         # moved away from gvm until https://github.com/moovweb/gvm/pull/470 and related issues are resolved.
 
@@ -15,8 +15,13 @@ main() {
         local version="1.22.1"
 
         local os="linux"
-        local arch="$(x="$(uname -m)" && if [[ "$x" == "aarch64" ]] || [[ "$x" == "arm64" ]] || [[ "$x" == "arm64v8" ]]; then printf 'arm64' ; else printf 'amd64' ; fi)"
-        local url="https://go.dev/dl/go${version}.${os}-${arch}.tar.gz"
+
+        local cpuarch="amd64"
+        if [[ "$(uname -m)" == "aarch64" ]]; then
+            cpuarch="arm64"
+        fi
+
+        local url="https://go.dev/dl/go${version}.${os}-${cpuarch}.tar.gz"
         printf '%s' "$url" > /tmp/go.url.txt
         curl -fsSL "$url" -o /tmp/go.tar.gz
         mkdir -p $HOME/.local/bin
@@ -30,6 +35,12 @@ BASHRC_EOF
         go version
         rm /tmp/go.tar.gz
         rm /tmp/go.url.txt
+
+        asdf plugin add golang
+        asdf install golang "$version"
+        asdf global golang "$version"
+
+        go version
     }
     main
 

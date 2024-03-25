@@ -8,9 +8,10 @@ main() {
     main() {
         set -eo pipefail ; . ~/.bashrc ; set -x
 
-        local latest_version="v1.22.19"
-        # latest_version="latest"
-        npm install -g "yarn@$latest_version"
+        corepack enable
+        asdf reshim
+
+        yarn --version
     }
     main
 

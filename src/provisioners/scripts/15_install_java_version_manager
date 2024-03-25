@@ -10,7 +10,7 @@ main() {
     # Ref: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
     mkdir -p /usr/share/man/man1
 
-    local major_version='11' # TODO: find out how to update to v12
+    local major_version='17'
     apt-get install -y \
         man-db \
         "openjdk-$major_version-jre-headless" \
@@ -18,7 +18,7 @@ main() {
 
     sudo -u vagrant bash <<'EOF'
     main() {
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
         export JENV_DIR="$HOME/.jenv"
 
@@ -27,7 +27,7 @@ main() {
         cd "$JENV_DIR"
         git fetch origin
 
-        local latest_jenv_release=0.5.5
+        local latest_jenv_release=0.5.7
         # latest_jenv_release="$(cd "$JENV_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "[0-9]*" $(git rev-list --tags --max-count=1))"
 
         git checkout -f "$latest_jenv_release"

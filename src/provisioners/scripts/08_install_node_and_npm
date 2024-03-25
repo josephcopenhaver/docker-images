@@ -1,0 +1,30 @@
+#!/bin/bash
+echo install node and npm and corepack
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    # https://nodejs.org/en/about/previous-releases
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="v20.11.1"
+
+        asdf plugin add nodejs
+
+        asdf install nodejs $version
+        asdf global nodejs $version
+
+        node --version
+        npm --version
+        corepack --version
+    }
+    main
+
+EOF
+
+}
+main
+)

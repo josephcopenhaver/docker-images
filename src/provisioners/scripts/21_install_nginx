@@ -6,7 +6,7 @@ main() {
 
     apt-get update
 
-    local version="1.14.2"
+    local version="1.22.1"
     # repo_version="=$(apt-cache madison nginx | grep -E '^\s*nginx\s*\|\s*'"$(sed -E 's/\./\\./' <<<"$version")" | sed -E 's/^[^\|]+\|\s*([^\|]+)\|.*$/\1/ ; s/\s+$//' | sort -u)"
 
     # looks like available repo version changes all the time, so not going to try and pin a specific revision anymore

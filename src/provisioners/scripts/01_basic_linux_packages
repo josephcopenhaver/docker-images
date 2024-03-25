@@ -25,7 +25,6 @@ main() {
         jq \
         openssh-client \
         tar \
-        netcat \
         curl \
         net-tools \
         dnsutils \
@@ -35,7 +34,7 @@ main() {
         iotop \
         time \
         expect \
-        netcat \
+        netcat-openbsd \
         git \
         ftp \
         ncftp \
@@ -44,7 +43,7 @@ main() {
         build-essential \
         xz-utils
 
-    local s6_version=v3.1.2.1
+    local s6_version=v3.1.6.2
     curl -fsSL "https://github.com/just-containers/s6-overlay/releases/download/$s6_version/s6-overlay-noarch.tar.xz" \
         | tar -Jxpf - -C /
     curl -fsSL "https://github.com/just-containers/s6-overlay/releases/download/$s6_version/s6-overlay-$(uname -m).tar.xz" \

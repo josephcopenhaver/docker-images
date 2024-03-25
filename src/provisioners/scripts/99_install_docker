@@ -4,58 +4,17 @@ echo install docker
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
 
-    if [[ "$(uname -m)" == "aarch64" ]]; then
-        echo "warning: skipping docker install because docker does not support aarch64 platform as of 2022-09-15"
-    else
+    curl -fsSL https://get.docker.com | sudo sh -
 
-        local version='=5:18.09.1~3-0~debian-stretch'
-        # set version to an empty string if this hardcoded version is no longer available for install
-        version=''
+    usermod -a -G docker vagrant
 
-        curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+    mkdir -p /etc/services.d/dockerd
+    cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/dockerd/run
+#!/bin/bash
+set -exo pipefail
 
-        local arch='amd64'
-        if [[ "$(uname -m)" == "aarch64" ]]; then
-            arch='arm64'
-        fi
-
-        printf 'deb [arch=%s] https://download.docker.com/linux/debian %s stable' "${arch}" "$(lsb_release -cs)" > /etc/apt/sources.list.d/docker.list
-
-        apt-get update
-
-        apt-get install -y "docker-ce$version"
-
-        pip install docker-compose
-
-        # verify installation of docker-compose works
-        docker-compose version
-
-        usermod -a -G docker vagrant
-
-        # install bash completion for docker-compose
-        sudo -u vagrant bash <<'EOF'
-        main() {
-            set -eo pipefail ; . /etc/provision_functions ; set -x
-
-            local version="$(docker-compose --version | sed -E 's/^.* version ([0-9.]+).*$/\1/')"
-            local file="$HOME/.bash_completions.d/docker-compose-$version"
-
-            curl -fsSL https://raw.githubusercontent.com/docker/compose/$version/contrib/completion/bash/docker-compose -o "$file"
-
-            bashrc_add_interactive <<BASHRC_EOF
-[ ! -s "$file" ] || . "$file"
-BASHRC_EOF
-        }
-        main
-
+exec /usr/bin/dockerd
 EOF
-
-        mkdir -p /etc/services.d/dockerd
-        cat <<'EOF' | install -m 0744 /dev/stdin /etc/services.d/dockerd/run
-#!/usr/bin/execlineb -P
-/usr/bin/dockerd
-EOF
-    fi
 }
 main
 )

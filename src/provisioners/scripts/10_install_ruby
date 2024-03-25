@@ -1,0 +1,32 @@
+#!/bin/bash
+echo install ruby
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+
+    apt-get install -y libyaml-dev
+
+    # latest versions of ruby can be found here: https://www.ruby-lang.org/en/downloads/
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="3.3.0"
+
+        asdf plugin add ruby
+
+        asdf install ruby $version
+        asdf global ruby $version
+
+        ruby --version
+    }
+    main
+
+EOF
+
+}
+main
+)

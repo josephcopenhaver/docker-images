@@ -10,7 +10,7 @@ main() {
 
         sudo -u vagrant bash <<'EOF'
         main() {
-            set -eo pipefail ; . /etc/provision_functions ; set -x
+            set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
             bashrc_add_noninteractive <<'BASHRC_EOF'
 export KUBE_ENV_HOME="$HOME/.kube_env"
@@ -18,7 +18,7 @@ BASHRC_EOF
 
             mkdir -p "$KUBE_ENV_HOME/bin"
 
-            local version="v1.25.1"
+            local version="v1.29.3"
             # version="$(curl -fsSL https://storage.googleapis.com/kubernetes-release/release/stable.txt)" # latest stable version
 
             mkdir -p "$KUBE_ENV_HOME/versions/$version"

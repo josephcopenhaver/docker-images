@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install go version manager
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.15.0"
+
+        asdf plugin add mage
+        asdf install mage "$version"
+        asdf global mage "$version"
+
+        mage -version
+    }
+    main
+
+EOF
+
+}
+main
+)

@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install rust
+(
+main() {
+    set -exo pipefail
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="2.0.2"
+
+        asdf plugin add nim
+        asdf install nim "$version"
+        asdf global nim "$version"
+
+        nim --version
+    }
+    main
+
+EOF
+
+}
+main
+)

@@ -67,6 +67,7 @@ bashrc_add_interactive() {
 
     [ -z "$set_x" ] || set -x
 }
+
 EOF
 
 }

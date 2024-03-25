@@ -1,12 +1,12 @@
 #!/bin/bash
-echo configure python version manager
+echo configure pyenv
 (
 main() {
     set -exo pipefail
 
     sudo -u vagrant bash <<'EOF'
     main() {
-        set -eo pipefail ; . /etc/provision_functions ; set -x
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
         curl -fsSL https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 
@@ -23,7 +23,7 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 BASHRC_EOF
 
-        pyenv install --skip-existing 3.10.7
+        pyenv install --skip-existing 3.12.2
     }
     main
 

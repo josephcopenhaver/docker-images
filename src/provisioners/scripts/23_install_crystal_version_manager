@@ -1,0 +1,31 @@
+#!/bin/bash
+echo install rust
+(
+main() {
+    set -exo pipefail
+
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        echo "warning: skipping nim install because choosenim does not support aarch64 platform as of 2022-09-15"
+    else
+
+        sudo -u vagrant bash <<'EOF'
+        main() {
+            set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+            local version="1.11.2"
+
+            asdf plugin add crystal
+            asdf install crystal "$version"
+            asdf global crystal "$version"
+
+            crystal --version
+        }
+        main
+
+EOF
+
+    fi
+
+}
+main
+)

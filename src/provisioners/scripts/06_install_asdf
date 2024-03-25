@@ -1,0 +1,34 @@
+#!/bin/bash
+echo install homebrew on linux, a.k.a. linuxbrew
+(
+main() {
+    set -exo pipefail
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="v0.14.0"
+
+        mkdir -p "$HOME/.local/asdf.data"
+        git clone https://github.com/asdf-vm/asdf.git "$HOME/.local/asdf" --branch "$version"
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+export ASDF_DIR="$HOME/.local/asdf"
+export ASDF_DATA_DIR="$HOME/.local/asdf.data"
+. "$ASDF_DIR/asdf.sh"
+BASHRC_EOF
+
+        bashrc_add_interactive <<'BASHRC_EOF'
+. "$ASDF_DIR/completions/asdf.bash"
+BASHRC_EOF
+
+        asdf version
+    }
+    main
+
+EOF
+
+}
+main
+)

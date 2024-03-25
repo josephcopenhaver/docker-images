@@ -10,14 +10,14 @@ main() {
 
     command -v pip || apt-get install -y python3-pip
 
-    pip install -U \
+    pip install --break-system-packages -U \
         pip \
         pipenv
 
     apt-get install -y \
         libsqlite3-dev \
         \
-        libffi7 \
+        libffi8 \
         libffi-dev \
         liblzma-dev \
         \
