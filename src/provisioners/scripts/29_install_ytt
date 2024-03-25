@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install go version manager
+echo install yq
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
@@ -8,13 +8,13 @@ main() {
     main() {
         set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
-        local version="1.57.1"
+        local version="0.48.0"
 
-        asdf plugin add golangci-lint
-        asdf install golangci-lint "$version"
-        asdf global golangci-lint "$version"
+        asdf plugin add ytt
+        asdf install ytt "$version"
+        asdf global ytt "$version"
 
-        golangci-lint version
+        ytt --version
     }
     main
 

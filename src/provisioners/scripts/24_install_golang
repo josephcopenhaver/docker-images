@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install go version manager
+echo install golang
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

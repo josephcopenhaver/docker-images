@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install homebrew on linux, a.k.a. linuxbrew
+echo install asdf
 (
 main() {
     set -exo pipefail
@@ -12,6 +12,8 @@ main() {
 
         mkdir -p "$HOME/.local/asdf.data"
         git clone https://github.com/asdf-vm/asdf.git "$HOME/.local/asdf" --branch "$version"
+
+        [[ "$(cd "$HOME/.local/asdf" && git log -1 --format="%H")" = "ccdd47df9b73d0a22235eb06ad4c48eb57360832" ]] || ( >&2 echo "signature mismatch" && exit 1 )
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
 export ASDF_DIR="$HOME/.local/asdf"

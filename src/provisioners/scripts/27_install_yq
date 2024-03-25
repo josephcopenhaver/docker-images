@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install mage
+echo install yq
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
@@ -8,13 +8,13 @@ main() {
     main() {
         set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
-        local version="1.15.0"
+        local version="4.43.1"
 
-        asdf plugin add mage
-        asdf install mage "$version"
-        asdf global mage "$version"
+        asdf plugin add yq
+        asdf install yq "$version"
+        asdf global yq "$version"
 
-        mage -version
+        yq --version
     }
     main
 

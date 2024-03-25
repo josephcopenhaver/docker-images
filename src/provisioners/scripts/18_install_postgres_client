@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install mysql client
+echo install postgres client
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

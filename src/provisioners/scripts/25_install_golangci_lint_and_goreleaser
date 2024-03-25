@@ -1,0 +1,35 @@
+#!/bin/bash
+echo install golangci-lint and goreleaser
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.57.1"
+
+        asdf plugin add golangci-lint
+        asdf install golangci-lint "$version"
+        asdf global golangci-lint "$version"
+
+        golangci-lint version
+
+        #########
+
+        version="1.24.0"
+
+        asdf plugin add goreleaser
+        asdf install goreleaser "$version"
+        asdf global goreleaser "$version"
+
+        goreleaser --version
+    }
+    main
+
+EOF
+
+}
+main
+)

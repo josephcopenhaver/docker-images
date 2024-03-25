@@ -1,0 +1,41 @@
+#!/bin/bash
+echo install yq
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        # latest stable release:
+        # https://github.com/ziglang/zig/releases
+
+        local version="0.11.0"
+
+        local bundle="zig-linux-$(uname -m)-$version"
+        local fname="$bundle.tar.xz"
+        local url="https://ziglang.org/builds/$fname"
+
+        mkdir /tmp/zig-bundle
+        cd /tmp/zig-bundle
+        curl -fsSL "$url" -o "$fname"
+        sha256sum -c <(printf "956eb095d8ba44ac6ebd27f7c9956e47d92937c103bf754745d0a39cdaa5d4c6 $fname")
+
+        tar xf "$fname"
+
+        printf '%s' "$version" > "$bundle/version.txt"
+        mv "$bundle" "$HOME/.local/zig"
+
+        ln -s "$HOME/.local/zig/zig" "$HOME/.local/bin/zig"
+        "$HOME/.local/bin/zig" version
+
+        rm -rf /tmp/zig-bundle
+    }
+    main
+
+EOF
+
+}
+main
+)

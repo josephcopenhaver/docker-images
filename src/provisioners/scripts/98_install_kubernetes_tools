@@ -4,55 +4,51 @@ echo install k8s tools
 main() {
     set -exo pipefail
 
-    if [[ "$(uname -m)" == "aarch64" ]]; then
-        echo "warning: skipping k8s tools install because k8s does not support aarch64 platform as of 2022-09-15"
-    else
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
-        sudo -u vagrant bash <<'EOF'
-        main() {
-            set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
-
-            bashrc_add_noninteractive <<'BASHRC_EOF'
+        bashrc_add_noninteractive <<'BASHRC_EOF'
 export KUBE_ENV_HOME="$HOME/.kube_env"
 BASHRC_EOF
 
-            mkdir -p "$KUBE_ENV_HOME/bin"
+        mkdir -p "$KUBE_ENV_HOME/bin"
 
-            local version="v1.29.3"
-            # version="$(curl -fsSL https://storage.googleapis.com/kubernetes-release/release/stable.txt)" # latest stable version
+        local version="v1.29.3"
+        # version="$(curl -fsSL https://storage.googleapis.com/kubernetes-release/release/stable.txt)" # latest stable version
 
-            mkdir -p "$KUBE_ENV_HOME/versions/$version"
+        mkdir -p "$KUBE_ENV_HOME/versions/$version"
 
-            cd "$KUBE_ENV_HOME/versions/$version"
+        cd "$KUBE_ENV_HOME/versions/$version"
 
-            local cpuarch="amd64"
-            if [[ "$(uname -m)" == "aarch64" ]]; then
-                cpuarch="arm64"
-            fi
+        local cpuarch="amd64"
+        if [[ "$(uname -m)" == "aarch64" ]]; then
+            cpuarch="arm64"
+        fi
 
-            curl -fsSL --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/$version/bin/linux/${cpuarch}/"{kubeadm,kubelet,kubectl}
+        curl -fsSL --remote-name-all "https://storage.googleapis.com/kubernetes-release/release/$version/bin/linux/${cpuarch}/"{kubeadm,kubelet,kubectl}
 
-            chmod +x {kubeadm,kubelet,kubectl}
+        chmod +x {kubeadm,kubelet,kubectl}
 
-            ln -s "$KUBE_ENV_HOME/versions/$version"/{kubeadm,kubelet,kubectl} "$KUBE_ENV_HOME/bin/"
+        ln -s "$KUBE_ENV_HOME/versions/$version"/{kubeadm,kubelet,kubectl} "$KUBE_ENV_HOME/bin/"
 
-            bashrc_add_noninteractive <<'BASHRC_EOF'
+        bashrc_add_noninteractive <<'BASHRC_EOF'
 export PATH="$PATH:$KUBE_ENV_HOME/bin"
 BASHRC_EOF
 
-            # Install interactive mode bash completions
+        # Install interactive mode bash completions
 
-            bashrc_add_interactive <<'BASHRC_EOF'
+        bashrc_add_interactive <<'BASHRC_EOF'
 eval "$(kubeadm completion bash)"
 eval "$(kubectl completion bash)"
 BASHRC_EOF
 
-        }
-        main
+        kubeadm version
+        kubelet --version
+    }
+    main
 
 EOF
-
-    fi
 }
 main
 )

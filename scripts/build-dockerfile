@@ -19,7 +19,7 @@ cp generators/fileparts/dockerfile/start Dockerfile
 find provisioners/scripts/ -type f | sort | \
 while read file; do
     dst="/tmp/$(basename "$file")"
-    printf '\nCOPY ./%s %s\nRUN %s \\\n && rm %s \\\n && rm -rf /var/lib/apt/lists/*\n' \
+    printf '\nCOPY ./%s %s\nRUN %s \\\n && rm %s \\\n && rm -rf /tmp/* /var/lib/apt/lists/*\n' \
         "$file" "$dst" "$dst" "$dst" \
         >> Dockerfile
 done

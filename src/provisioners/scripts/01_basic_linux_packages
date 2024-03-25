@@ -41,7 +41,8 @@ main() {
         tmux \
         tmate \
         build-essential \
-        xz-utils
+        xz-utils \
+        unzip
 
     local s6_version=v3.1.6.2
     curl -fsSL "https://github.com/just-containers/s6-overlay/releases/download/$s6_version/s6-overlay-noarch.tar.xz" \

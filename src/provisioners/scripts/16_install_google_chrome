@@ -30,7 +30,7 @@ main() {
             # let continue
             rm /etc/apt/sources.list.d/google-chrome.list
             apt-get update
-            echo "warning: skipping google-chrome-stable package installation: architecture was aarch64 and as of 2022-09-15 is not present on the remote repository"
+            echo "warning: skipping google-chrome-stable package installation: architecture was aarch64 and as of 2022-09-15, 2024-03-25 is not present on the remote repository"
         else
             echo "failed to install google-chrome-stable package"
             exit $exitcode

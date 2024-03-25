@@ -14,6 +14,8 @@ main() {
         asdf install rust "$version"
         asdf global rust "$version"
 
+        bashrc_add_noninteractive < <(printf 'export PATH="$PATH:$ASDF_DATA_DIR/installs/rust/%s/bin"\n' "$version")
+
         bashrc_add_interactive <<'BASHRC_EOF'
 eval "$(rustup completions bash)"
 BASHRC_EOF

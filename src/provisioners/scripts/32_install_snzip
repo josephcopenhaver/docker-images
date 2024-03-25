@@ -1,0 +1,46 @@
+#!/bin/bash
+echo install yq
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+
+    apt-get install -y \
+        libsnappy-dev
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.0.5"
+        # local gitsha="177710191765af31bb1ca3d50b3b90ba0561c646"
+        local url="https://github.com/kubo/snzip/releases/download/v$version/snzip-$version.tar.gz"
+
+        mkdir "/tmp/snzip-tar-src"
+        cd "/tmp/snzip-tar-src"
+        curl -fsSL "$url" -o "snzip-$version.tar.gz"
+        sha256sum -c <(printf "fbb6b816619628f385b62f44a00a1603be157fba6ed2d30de490b0c5e645bff8 snzip-$version.tar.gz")
+
+        tar xvfz "snzip-$version.tar.gz"
+        cd "snzip-$version"
+        ./configure
+        make prefix=''
+        make prefix='' DESTDIR="$HOME/.local/snzip" install
+
+        cd /
+        rm -rf "/tmp/snzip-tar-src"
+
+        ln -s "$HOME/.local/snzip/bin/snzip" "$HOME/.local/bin/snzip"
+        ln -s "$HOME/.local/snzip/bin/snzcat" "$HOME/.local/bin/snzcat"
+        ln -s "$HOME/.local/snzip/bin/snunzip" "$HOME/.local/bin/snunzip"
+
+        "$HOME/.local/bin/snzip" -c /dev/null > /dev/null
+    }
+    main
+
+EOF
+
+}
+main
+)

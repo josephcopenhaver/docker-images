@@ -1,0 +1,32 @@
+#!/bin/bash
+echo install yq
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.2.0"
+
+        asdf plugin add scala-cli
+        asdf install scala-cli "$version"
+        asdf global scala-cli "$version"
+
+        scala-cli --version
+        scala-cli config power true
+
+        # prime the runtime cache
+        #
+        # TODO: replace with something that exits with a zero response code
+        # any error can occur here and stop the cache from being primed
+        bash -c 'cd "$HOME" && scala-cli repl < <(echo ":q")' || true
+    }
+    main
+
+EOF
+
+}
+main
+)
