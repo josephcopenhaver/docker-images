@@ -1,0 +1,41 @@
+#!/bin/bash
+echo install r lang
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+
+    # note dependencies:
+    # https://github.com/asdf-community/asdf-r
+
+    apt-get install -y \
+        gfortran \
+        libpcre2-dev \
+        libcurl4-gnutls-dev
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="4.3.3"
+
+        asdf plugin add r
+        asdf install r $version
+        asdf global r $version
+
+        bashrc_add_noninteractive <<'BASHRC_EOF'
+alias r='\R'
+alias rscript='\Rscript'
+BASHRC_EOF
+
+        R --version
+        Rscript --version
+    }
+    main
+
+EOF
+
+}
+main
+)

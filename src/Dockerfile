@@ -174,6 +174,46 @@ RUN /tmp/33_install_zig \
  && rm /tmp/33_install_zig \
  && rm -rf /tmp/* /var/lib/apt/lists/*
 
+COPY ./provisioners/scripts/34_install_rlang /tmp/34_install_rlang
+RUN /tmp/34_install_rlang \
+ && rm /tmp/34_install_rlang \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/35_install_gnu_apl /tmp/35_install_gnu_apl
+RUN /tmp/35_install_gnu_apl \
+ && rm /tmp/35_install_gnu_apl \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/36_install_fzf /tmp/36_install_fzf
+RUN /tmp/36_install_fzf \
+ && rm /tmp/36_install_fzf \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/37_install_entr /tmp/37_install_entr
+RUN /tmp/37_install_entr \
+ && rm /tmp/37_install_entr \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/38_install_just /tmp/38_install_just
+RUN /tmp/38_install_just \
+ && rm /tmp/38_install_just \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/39_install_earthly /tmp/39_install_earthly
+RUN /tmp/39_install_earthly \
+ && rm /tmp/39_install_earthly \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/40_install_jsonpatch /tmp/40_install_jsonpatch
+RUN /tmp/40_install_jsonpatch \
+ && rm /tmp/40_install_jsonpatch \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
+COPY ./provisioners/scripts/41_install_jsonnet /tmp/41_install_jsonnet
+RUN /tmp/41_install_jsonnet \
+ && rm /tmp/41_install_jsonnet \
+ && rm -rf /tmp/* /var/lib/apt/lists/*
+
 COPY ./provisioners/scripts/98_install_kubernetes_tools /tmp/98_install_kubernetes_tools
 RUN /tmp/98_install_kubernetes_tools \
  && rm /tmp/98_install_kubernetes_tools \

@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install yq
+echo install scala
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive

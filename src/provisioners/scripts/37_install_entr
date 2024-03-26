@@ -1,0 +1,53 @@
+#!/bin/bash
+echo install entr
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        # a simpler inotify
+        # https://github.com/eradman/entr
+
+        # latest stable release:
+        # https://github.com/eradman/entr/tags
+
+        local version="5.5"
+
+        local bundle="entr-$version"
+        local fname="$version.tar.gz"
+        local url="https://github.com/eradman/entr/archive/refs/tags/$fname"
+
+        mkdir /tmp/entr-tar-src
+        cd /tmp/entr-tar-src
+        curl -fsSL "$url" -o "$fname"
+        sha256sum -c <(printf "128c0ce2efea5ae6bd3fd33c3cd31e161eb0c02609d8717ad37e95b41656e526 $fname")
+
+        tar xf "$fname"
+
+        cd "$bundle"
+        ./configure
+        make prefix=''
+        make prefix='' DESTDIR="$HOME/.local/entr" install
+
+        cd /
+        rm -rf /tmp/entr-tar-src
+
+        ln -s "$HOME/.local/entr/usr/local/bin/entr" "$HOME/.local/bin/entr"
+
+        test -s "$HOME/.local/bin/entr"
+        test -x "$HOME/.local/bin/entr"
+        test -s "$HOME/.local/entr/usr/local/bin/entr"
+        test -x "$HOME/.local/entr/usr/local/bin/entr"
+
+        # man $HOME/.local/entr/usr/local/share/man/man1/entr.1
+    }
+    main
+
+EOF
+
+}
+main
+)

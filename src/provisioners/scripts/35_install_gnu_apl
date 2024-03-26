@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install mage
+echo install ivy apl and gnu apl
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
@@ -8,15 +8,15 @@ main() {
     main() {
         set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
-        local version="1.15.0"
+        local version="0.3.4"
 
-        asdf plugin add mage
-        asdf install mage "$version"
-        asdf global mage "$version"
+        go install robpike.io/ivy@v$version
 
-        mage -version
+        [[ "$( ivy <(printf '1+2') )" = "3" ]] || (>&2 echo something went wrong ; exit 1)
 
         go clean -cache
+
+        # TODO: install gnu apl
     }
     main
 

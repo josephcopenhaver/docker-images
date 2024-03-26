@@ -1,5 +1,5 @@
 #!/bin/bash
-echo install mage
+echo install fzf
 (
 main() {
     set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
@@ -8,15 +8,13 @@ main() {
     main() {
         set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
 
-        local version="1.15.0"
+        local version="0.48.1"
 
-        asdf plugin add mage
-        asdf install mage "$version"
-        asdf global mage "$version"
+        asdf plugin add fzf
+        asdf install fzf $version
+        asdf global fzf $version
 
-        mage -version
-
-        go clean -cache
+        fzf --version
     }
     main
 

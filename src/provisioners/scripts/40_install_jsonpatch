@@ -1,0 +1,29 @@
+#!/bin/bash
+echo install json-patch
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        # latest release:
+        # https://github.com/evanphx/json-patch/releases
+
+        local version="5.9.0"
+
+        go install "github.com/evanphx/json-patch/v${version%%.*}/cmd/json-patch@v$version"
+
+        test -s "$HOME/.local/go/bin/json-patch"
+        test -x "$HOME/.local/go/bin/json-patch"
+
+        go clean -cache
+    }
+    main
+
+EOF
+
+}
+main
+)
