@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install actionlint
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="1.6.27"
+
+        asdf plugin add actionlint
+        asdf install actionlint $version
+        asdf global actionlint $version
+
+        actionlint --version
+    }
+    main
+
+EOF
+
+}
+main
+)

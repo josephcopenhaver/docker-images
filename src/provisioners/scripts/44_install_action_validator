@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install action-validator
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="0.6.0"
+
+        asdf plugin add action-validator
+        asdf install action-validator $version
+        asdf global action-validator $version
+
+        action-validator --version
+    }
+    main
+
+EOF
+
+}
+main
+)

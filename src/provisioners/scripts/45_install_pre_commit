@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install pre-commit
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="3.7.0"
+
+        asdf plugin add pre-commit
+        asdf install pre-commit $version
+        asdf global pre-commit $version
+
+        pre-commit --version
+    }
+    main
+
+EOF
+
+}
+main
+)

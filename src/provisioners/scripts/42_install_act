@@ -1,0 +1,25 @@
+#!/bin/bash
+echo install act
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        local version="0.2.60"
+
+        asdf plugin add act
+        asdf install act $version
+        asdf global act $version
+
+        act --version
+    }
+    main
+
+EOF
+
+}
+main
+)

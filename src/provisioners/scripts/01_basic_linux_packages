@@ -35,6 +35,7 @@ main() {
         time \
         expect \
         netcat-openbsd \
+        subversion \
         git \
         ftp \
         ncftp \
