@@ -31,7 +31,7 @@ main() {
         # latest_jenv_release="$(cd "$JENV_DIR" ; git fetch origin ; git describe --abbrev=0 --tags --match "[0-9]*" $(git rev-list --tags --max-count=1))"
 
         git checkout -f "$latest_jenv_release"
-        [[ "$(git log -1 --format="%H")" = "1032e0036da40f720766e563d766272699a420f7" ]] || ( >&2 echo "signature mismatch" && exit 1 )
+        [[ "$(git log -1 --format="%H")" == "1032e0036da40f720766e563d766272699a420f7" ]] || ( >&2 echo "signature mismatch" && exit 1 )
 
         bashrc_add_noninteractive <<'BASHRC_EOF'
 export JENV_DIR="$HOME/.jenv"

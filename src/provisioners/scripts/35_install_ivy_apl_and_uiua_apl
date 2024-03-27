@@ -12,7 +12,7 @@ main() {
 
         go install robpike.io/ivy@v$version
 
-        [[ "$( ivy <(printf '1+2') )" = "3" ]] || (>&2 echo something went wrong ; exit 1)
+        [[ "$( ivy <(printf '1+2') )" == "3" ]] || (>&2 echo something went wrong ; exit 1)
 
         go clean -cache
 
@@ -25,7 +25,7 @@ main() {
 
         git clone "https://github.com/uiua-lang/uiua.git" "/tmp/uiua.git" --branch "$version" --single-branch
 
-        [[ "$(cd "/tmp/uiua.git" && git log -1 --format="%H")" = "dff0cb712f452c6ade4d1f3606475d1565fa3c8c" ]] || ( >&2 echo "signature mismatch" && exit 1 )
+        [[ "$(cd "/tmp/uiua.git" && git log -1 --format="%H")" == "dff0cb712f452c6ade4d1f3606475d1565fa3c8c" ]] || ( >&2 echo "signature mismatch" && exit 1 )
 
         cargo install --path "/tmp/uiua.git"
         rm -rf "/tmp/uiua.git"

@@ -20,7 +20,7 @@ main() {
         mkdir "/tmp/snzip-tar-src"
         cd "/tmp/snzip-tar-src"
         curl -fsSL "$url" -o "snzip-$version.tar.gz"
-        sha256sum -c <(printf "fbb6b816619628f385b62f44a00a1603be157fba6ed2d30de490b0c5e645bff8 snzip-$version.tar.gz")
+        sha256sum -c <(printf '%s' "fbb6b816619628f385b62f44a00a1603be157fba6ed2d30de490b0c5e645bff8 snzip-$version.tar.gz")
 
         tar xvfz "snzip-$version.tar.gz"
         cd "snzip-$version"

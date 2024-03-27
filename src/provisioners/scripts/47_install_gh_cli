@@ -19,8 +19,10 @@ main() {
         local os="linux"
 
         local cpuarch="amd64"
+        local sig="c671d450d7c0e95c84fbc6996591fc851d396848acd53e589ee388031cee9330"
         if [[ "$(uname -m)" == "aarch64" ]]; then
             cpuarch="arm64"
+            sig="0b4d23c60872d3e43b94bbcf84ffd69719dc8f9d85d685deb0907774caea7b10"
         fi
 
         local bundle="gh_${version}_${os}_$cpuarch"
@@ -30,18 +32,18 @@ main() {
         mkdir /tmp/gh-bundle
         cd /tmp/gh-bundle
         curl -fsSL "$url" -o "$fname"
-        sha256sum -c <(printf "0b4d23c60872d3e43b94bbcf84ffd69719dc8f9d85d685deb0907774caea7b10 $fname")
+        sha256sum -c <(printf '%s' "$sig $fname")
 
         tar xf "$fname"
 
         printf '%s' "$version" > "$bundle/version.txt"
         mv "$bundle" "$HOME/.local/gh"
 
-        ln -s "$HOME/.local/gh/bin/gh" "$HOME/.local/bin/gh"
-        "$HOME/.local/bin/gh" --version
-
         cd /
         rm -rf /tmp/gh-bundle
+
+        ln -s "$HOME/.local/gh/bin/gh" "$HOME/.local/bin/gh"
+        "$HOME/.local/bin/gh" --version
     }
     main
 

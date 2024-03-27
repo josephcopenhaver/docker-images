@@ -23,7 +23,7 @@ main() {
         mkdir /tmp/entr-tar-src
         cd /tmp/entr-tar-src
         curl -fsSL "$url" -o "$fname"
-        sha256sum -c <(printf "128c0ce2efea5ae6bd3fd33c3cd31e161eb0c02609d8717ad37e95b41656e526 $fname")
+        sha256sum -c <(printf '%s' "128c0ce2efea5ae6bd3fd33c3cd31e161eb0c02609d8717ad37e95b41656e526 $fname")
 
         tar xf "$fname"
 

@@ -23,7 +23,7 @@ main() {
         mkdir /tmp/cntlm-tar-src
         cd /tmp/cntlm-tar-src
         curl -fsSL "$url" -o "$fname"
-        sha256sum -c <(printf "9c3ad10924d43f7248df9ecd33cbc033afbd7ea8d9545de0d68a2782fed76298 $fname")
+        sha256sum -c <(printf '%s' "9c3ad10924d43f7248df9ecd33cbc033afbd7ea8d9545de0d68a2782fed76298 $fname")
 
         tar xf "$fname"
 

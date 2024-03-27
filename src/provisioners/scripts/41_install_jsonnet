@@ -14,8 +14,10 @@ main() {
         local version="0.20.0"
 
         local cpuarch="x86_64"
+        local sig="a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
         if [[ "$(uname -m)" == "aarch64" ]]; then
             cpuarch="arm64"
+            sig="49fbc99c91dcd2be53fa856307de3b8708c91dc5c74740714fdf9317957322e0"
         fi
 
         local bundle="go-jsonnet_${version}_Linux_$cpuarch"
@@ -25,7 +27,7 @@ main() {
         mkdir /tmp/jsonnet-bundle
         cd /tmp/jsonnet-bundle
         curl -fsSL "$url" -o "$fname"
-        sha256sum -c <(printf "49fbc99c91dcd2be53fa856307de3b8708c91dc5c74740714fdf9317957322e0 $fname")
+        sha256sum -c <(printf '%s' "$sig $fname")
 
         mkdir "$bundle"
         tar xf "$fname" -C "$bundle"
