@@ -10,13 +10,16 @@ main() {
     # this is done by setting the version to an empty string
     chrome_version=""
 
-    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    local keyurl="https://dl-ssl.google.com/linux/linux_signing_key.pub"
+    local signingFile="/etc/apt/keyrings/$(printf %s "$keyurl" | base64 -w0 | sed -r 's/=+$//').pub"
+
+    curl -fsSL "$keyurl" -o "$signingFile"
 
     # note as of 2022-09-15 installing stable chrome leads to /etc/apt/sources.list.d/google-chrome.list being created/rewritten
     # so this command's output file is now /etc/apt/sources.list.d/google-chrome.list to avoid duplicate entry warnings
     #
     # thanks google
-    printf "deb https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+    printf "deb [signed-by=%s] https://dl.google.com/linux/chrome/deb/ stable main" "$signingFile" > /etc/apt/sources.list.d/google-chrome.list
 
     apt-get update
 
@@ -28,7 +31,7 @@ main() {
         # going to raise an error unless the platform is aarch64
         if [[ "$(uname -m)" == "aarch64" ]]; then
             # let continue
-            rm /etc/apt/sources.list.d/google-chrome.list
+            rm /etc/apt/sources.list.d/google-chrome.list "$signingFile"
             apt-get update
             echo "warning: skipping google-chrome-stable package installation: architecture was aarch64 and as of 2022-09-15, 2024-03-25 is not present on the remote repository"
         else
