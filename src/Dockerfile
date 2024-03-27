@@ -285,6 +285,12 @@ RUN /tmp/46_install_cntlm \
  && rm -rf /var/lib/apt/lists/* \
  && find /tmp -maxdepth 1 -mindepth 1 -exec rm -rf -- \{} +
 
+COPY ./provisioners/scripts/47_install_gh_cli /tmp/47_install_gh_cli
+RUN /tmp/47_install_gh_cli \
+ && rm /tmp/47_install_gh_cli \
+ && rm -rf /var/lib/apt/lists/* \
+ && find /tmp -maxdepth 1 -mindepth 1 -exec rm -rf -- \{} +
+
 COPY ./provisioners/scripts/98_install_kubernetes_tools /tmp/98_install_kubernetes_tools
 RUN /tmp/98_install_kubernetes_tools \
  && rm /tmp/98_install_kubernetes_tools \

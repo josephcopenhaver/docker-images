@@ -30,6 +30,7 @@ main() {
         ln -s "$HOME/.local/zig/zig" "$HOME/.local/bin/zig"
         "$HOME/.local/bin/zig" version
 
+        cd /
         rm -rf /tmp/zig-bundle
     }
     main

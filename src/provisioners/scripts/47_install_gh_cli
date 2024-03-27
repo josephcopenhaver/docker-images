@@ -1,0 +1,52 @@
+#!/bin/bash
+echo install cntlm
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        # a simple corporate proxy
+        #
+        # https://sourceforge.net/projects/cntlm/
+        #
+        # https://github.com/versat/cntlm
+
+        local version="2.46.0"
+
+        local os="linux"
+
+        local cpuarch="amd64"
+        if [[ "$(uname -m)" == "aarch64" ]]; then
+            cpuarch="arm64"
+        fi
+
+        local bundle="gh_${version}_${os}_$cpuarch"
+        local fname="$bundle.tar.gz"
+        local url="https://github.com/cli/cli/releases/download/v$version/$fname"
+
+        mkdir /tmp/gh-bundle
+        cd /tmp/gh-bundle
+        curl -fsSL "$url" -o "$fname"
+        sha256sum -c <(printf "0b4d23c60872d3e43b94bbcf84ffd69719dc8f9d85d685deb0907774caea7b10 $fname")
+
+        tar xf "$fname"
+
+        printf '%s' "$version" > "$bundle/version.txt"
+        mv "$bundle" "$HOME/.local/gh"
+
+        ln -s "$HOME/.local/gh/bin/gh" "$HOME/.local/bin/gh"
+        "$HOME/.local/bin/gh" --version
+
+        cd /
+        rm -rf /tmp/gh-bundle
+    }
+    main
+
+EOF
+
+}
+main
+)
