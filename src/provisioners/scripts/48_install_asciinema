@@ -1,0 +1,39 @@
+#!/bin/bash
+echo install asciinema
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    local version="==v2.4.0"
+
+    pip install --break-system-packages "asciinema$version"
+
+    asciinema --version
+
+    # TODO: in next version of asciinema, install via cargo...
+
+#     sudo -u vagrant bash <<'EOF'
+#     main() {
+#         set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+#         # latest release:
+#         # https://github.com/asciinema/asciinema/releases
+
+#         local version="v2.4.0"
+
+#         git clone 'https://github.com/asciinema/asciinema.git' /tmp/asciinema.git --branch "$version" --single-branch
+
+#         [[ "$(cd /tmp/asciinema.git && git log -1 --format="%H")" == "1a71be26c4c29e7cd98b97a11233cf3fb724ba9b" ]] || ( >&2 echo "signature mismatch" && exit 1 )
+
+#         cargo install --path /tmp/asciinema.git
+#         rm -rf /tmp/asciinema.git
+
+#         asciinema --version
+#     }
+#     main
+
+# EOF
+
+}
+main
+)
