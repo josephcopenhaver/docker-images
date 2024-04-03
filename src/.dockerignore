@@ -1,4 +1,4 @@
-./.dockerignore
-./README.md
-./.gitattributes
-./generators/
+./*
+./**/*
+
+!./provisioners/*

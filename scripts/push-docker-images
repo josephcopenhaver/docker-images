@@ -9,6 +9,7 @@ if [ -z "${GITHUB_SHA}" ]; then
     exit 1
 fi
 
-docker tag josephcopenhaver/docker-images:dev-environment-latest "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
+# copy commit-sha to latest tag
+docker buildx imagetools create --tag josephcopenhaver/docker-images:dev-environment-latest "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
 docker push "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
 docker push josephcopenhaver/docker-images:dev-environment-latest

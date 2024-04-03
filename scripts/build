@@ -36,16 +36,29 @@ BRANCH="${BRANCH:-$DETACHED_BRANCH}"
 
 DOCKER_IMAGE="josephcopenhaver/docker-images:${BRANCH#*/}-$version"
 
-HASH1=$(docker images -q "$DOCKER_IMAGE")
+HASHES1=$(docker images -q "$DOCKER_IMAGE" | sort -u)
 
-export DOCKER_BUILD_PLATFORM="${DOCKER_BUILD_PLATFORM:-${DOCKER_PLATFORM:-${DOCKER_DEFAULT_PLATFORM:-linux/$(uname -m)}}}"
+DOCKER_BUILD_PLATFORM="${DOCKER_BUILD_PLATFORM:-${DOCKER_PLATFORM:-${DOCKER_DEFAULT_PLATFORM:-linux/$(uname -m)}}}"
 
 docker buildx build "--platform=$DOCKER_BUILD_PLATFORM" \
     $( test -z "$CACHE_FROM" || printf -- '--cache-from %s' "$CACHE_FROM" ) \
     -t "$DOCKER_IMAGE" \
     .
 
-[ -z "$HASH1" ] || [ "$HASH1" == "$(docker images -q "$DOCKER_IMAGE")" ] || (
-    docker rmi "$HASH1" || true
-    echo 'Unused images could still exist. You should run "docker image prune"'
-)
+set +x
+if [ -n "$HASHES1" ]; then
+    HASHES2="\n$(docker images -q "$DOCKER_IMAGE" | sort -u)\n"
+    REMOVABLES=""
+    HASH=''
+    while read HASH; do
+        if [[ "\n$HASH\n" == *"$HASHES2"* ]]; then
+            continue
+        fi
+        [ -z "$REMOVABLES" ] && REMOVABLES="$HASH" || REMOVABLES="${REMOVABLES} ${HASH}"
+    done < <(printf '%s\n' "$HASHES1")
+    [ -z "$REMOVABLES" ] || (
+        set -x
+        docker rmi $REMOVABLES || true
+        echo 'Unused images could still exist. You should run "docker image prune"'
+    )
+fi
