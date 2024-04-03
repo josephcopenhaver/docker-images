@@ -10,8 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: release/dev-environment
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: build image
-        run: DOCKER_DEFAULT_PLATFORM=linux/amd64 ./scripts/build
+        run: DOCKER_BUILD_PLATFORM=linux/amd64,linux/arm64 ./scripts/build
