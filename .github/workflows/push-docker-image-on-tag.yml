@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+      - name: "cleanup space: remove files not critical for docker"
+        run: |
+          ./scripts/reclaim-runner-space.sh
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
