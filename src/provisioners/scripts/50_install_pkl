@@ -1,0 +1,32 @@
+#!/bin/bash
+echo install pkl
+(
+main() {
+    set -exo pipefail ; export DEBIAN_FRONTEND=noninteractive
+
+    sudo -u vagrant bash <<'EOF'
+    main() {
+        set -eo pipefail ; . ~/.bashrc ; . /etc/provision_functions ; set -x
+
+        #
+        # https://pkl-lang.org/
+        #
+
+        # latest version:
+        # https://github.com/apple/pkl/releases
+
+        local version="0.25.3"
+
+        asdf plugin add pkl
+        asdf install pkl $version
+        asdf global pkl $version
+
+        pkl --version
+    }
+    main
+
+EOF
+
+}
+main
+)

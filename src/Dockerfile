@@ -303,6 +303,12 @@ RUN /tmp/49_install_julia \
  && rm -rf /var/lib/apt/lists/* \
  && find /tmp -maxdepth 1 -mindepth 1 -exec rm -rf -- \{} +
 
+COPY ./provisioners/scripts/50_install_pkl /tmp/50_install_pkl
+RUN /tmp/50_install_pkl \
+ && rm /tmp/50_install_pkl \
+ && rm -rf /var/lib/apt/lists/* \
+ && find /tmp -maxdepth 1 -mindepth 1 -exec rm -rf -- \{} +
+
 COPY ./provisioners/scripts/98_install_kubernetes_tools /tmp/98_install_kubernetes_tools
 RUN /tmp/98_install_kubernetes_tools \
  && rm /tmp/98_install_kubernetes_tools \

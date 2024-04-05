@@ -10,6 +10,6 @@ if [ -z "${GITHUB_SHA}" ]; then
 fi
 
 # copy commit-sha to latest tag
-docker buildx imagetools create --tag josephcopenhaver/docker-images:dev-environment-latest "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
+docker buildx imagetools create --tag "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}" josephcopenhaver/docker-images:dev-environment-latest
 docker push "josephcopenhaver/docker-images:dev-environment-${GITHUB_SHA}"
 docker push josephcopenhaver/docker-images:dev-environment-latest
